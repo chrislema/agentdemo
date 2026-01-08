@@ -1,0 +1,421 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "chris-teitzel-mcode-001",
+  "assessment_date": "2023-09-25",
+  
+  "identity": {
+    "display_name": "Chris",
+    "persona_type": "synthetic_user",
+    "source": "mcode_assessment"
+  },
+
+  "motivational_core": {
+    "top_5": [
+      {
+        "rank": 1,
+        "name": "Identify Potential",
+        "score": 10.0,
+        "description": "Uncover, discover and harness realized or unrealized potential.",
+        "drivers": {
+          "dig": "Can see beyond surface qualities to underlying potential",
+          "search": "Motivated when finding value in places others have overlooked",
+          "retrieve": "Energy focused on drawing out and realizing possibilities",
+          "reveal": "Enjoys bringing discoveries to light and seeing them used by others"
+        },
+        "thriving_environments": [
+          "There is much promise and new prospects",
+          "Possibility-thinking and ambition are promoted",
+          "The culture 'brings out the best in people'",
+          "Mentoring, personal and professional growth are highly valued"
+        ],
+        "struggling_environments": [
+          "There is little investment in training or developing people",
+          "Simply refining, reengineering or repositioning is the focus",
+          "Seeking and envisioning new possibilities are stifled"
+        ],
+        "flip_side": "Tendency to see the potential in people and possibilities could cause poor investments of resources that never come to fruition."
+      },
+      {
+        "rank": 2,
+        "name": "Demonstrate Learning",
+        "score": 9.7,
+        "description": "Learn how to do something new and to show that you can do it.",
+        "drivers": {
+          "model": "Enjoys developing knowledge or skill to proficiency, then demonstrating that proficiency",
+          "practice": "Motivated to learn or develop basic skills as quickly as possible",
+          "example": "Energy comes from teaching, showing, modeling and living out what learned",
+          "experiment": "Always learning new things, trying new things, and doing new things"
+        },
+        "thriving_environments": [
+          "Learning and personal growth are essential in the environment",
+          "There is application of learning in the work",
+          "There is opportunity to present findings and outcomes",
+          "There is an opportunity for teaching and modeling"
+        ],
+        "struggling_environments": [
+          "Where there is less flexibility for change",
+          "Where the work is defined and structured",
+          "Where individualism isn't highly valued or necessary",
+          "Where there is limited ability for promotion and advancement"
+        ],
+        "flip_side": "May feel discontent unless continually learning something new. May experience frustration if others are not open to receiving and adopting things learned."
+      },
+      {
+        "rank": 3,
+        "name": "Persuade",
+        "score": 9.7,
+        "description": "Influence someone's thoughts, feelings or behaviors.",
+        "drivers": {
+          "engage": "Engages and influences people (or other living things that can be influenced)",
+          "push": "Sensitive to dynamics of behavior and adept at getting through to people",
+          "reactions": "Interested in both short-term and long-term responses",
+          "influential": "Likes to evoke a change in thoughts, feelings, or behavior"
+        },
+        "thriving_environments": [
+          "Sales is a critical component of the company",
+          "The flow of interaction and ideas matter",
+          "Persuasion is a part of the predominant culture",
+          "There is openness to change; allowing for new ways"
+        ],
+        "struggling_environments": [
+          "A highly established culture and values are not prominent",
+          "Mass production and high automation define the business",
+          "Process and procedure are the focus"
+        ],
+        "flip_side": "Tendency to focus on response from others could cause overselling ideas and might be distracting to the work. Need to remain self-aware of personal need for a response or feedback."
+      },
+      {
+        "rank": 4,
+        "name": "Make An Impact",
+        "score": 9.7,
+        "description": "Shape and impact the world around you.",
+        "drivers": {
+          "difference": "Wants to see a distinct impression or real difference made",
+          "creativity": "Desires freedom and control to shape things as seen fit",
+          "connection": "Encouraged when seeing change in people's behavior",
+          "world_changer": "Agent of change"
+        },
+        "thriving_environments": [
+          "The object of products and/or services are people",
+          "Bringing a high degree of change is the goal",
+          "Individual expression and creativity are welcomed",
+          "Vision is ambitious and well-articulated"
+        ],
+        "struggling_environments": [
+          "The company is focused on tasks and processes",
+          "There may not be room for creative freedom and expression",
+          "Cannot see immediate or tangible results"
+        ],
+        "flip_side": "Might be subject to over-impacting, over-shaping, trying to make a difference when not needed or required. Could be overly compelled to making the work about self and what is desired."
+      },
+      {
+        "rank": 5,
+        "name": "Improve",
+        "score": 9.4,
+        "description": "Consistently seek to make things better and enhance them.",
+        "drivers": {
+          "lookout": "Constantly explores surroundings in search of something to improve",
+          "expert": "Will find something to revise, remodel, rearrange, or refine",
+          "skilled": "Has extensive skills in a variety of environments",
+          "refine": "Has a drive to make things better"
+        },
+        "thriving_environments": [
+          "Skills and capabilities are developed",
+          "Personal growth is promoted",
+          "Things are being brought to new levels of functionality and development",
+          "Management is mentoring and investing in employees"
+        ],
+        "struggling_environments": [
+          "Processes are not highly developed",
+          "There is a strong sense of tradition and set way of doing things",
+          "The products or services are already highly developed"
+        ],
+        "flip_side": "May be critical of existing standards, processes, pushing against the status quo, which may result in stepping on other people's toes with unwanted advice."
+      }
+    ],
+
+    "full_ranking": [
+      { "rank": 1, "name": "Identify Potential", "score": 10.0 },
+      { "rank": 2, "name": "Demonstrate Learning", "score": 9.7 },
+      { "rank": 3, "name": "Persuade", "score": 9.7 },
+      { "rank": 4, "name": "Make An Impact", "score": 9.7 },
+      { "rank": 5, "name": "Improve", "score": 9.4 },
+      { "rank": 6, "name": "Experience The Ideal", "score": 9.4 },
+      { "rank": 7, "name": "Overcome", "score": 9.2 },
+      { "rank": 8, "name": "Meet Needs", "score": 9.2 },
+      { "rank": 9, "name": "Collaborate", "score": 8.9 },
+      { "rank": 10, "name": "Establish", "score": 8.6 },
+      { "rank": 11, "name": "Take Charge", "score": 8.6 },
+      { "rank": 12, "name": "Realize The Vision", "score": 8.6 },
+      { "rank": 13, "name": "Comprehend And Express", "score": 8.6 },
+      { "rank": 14, "name": "Develop", "score": 8.6 },
+      { "rank": 15, "name": "Meet The Challenge", "score": 8.0 },
+      { "rank": 16, "name": "Be Key", "score": 7.8 },
+      { "rank": 17, "name": "Mastery", "score": 7.8 },
+      { "rank": 18, "name": "Gain Ownership", "score": 7.8 },
+      { "rank": 19, "name": "Design", "score": 7.5 },
+      { "rank": 20, "name": "Explore", "score": 7.2 },
+      { "rank": 21, "name": "Be Unique", "score": 7.2 },
+      { "rank": 22, "name": "Make It Work", "score": 7.2 },
+      { "rank": 23, "name": "Advance", "score": 7.2 },
+      { "rank": 24, "name": "Excel", "score": 6.9 },
+      { "rank": 25, "name": "Evoke Recognition", "score": 6.6 },
+      { "rank": 26, "name": "Make The Team", "score": 6.3 },
+      { "rank": 27, "name": "Do It Right", "score": 6.3 },
+      { "rank": 28, "name": "Maximize", "score": 5.8 },
+      { "rank": 29, "name": "Architect", "score": 4.9 },
+      { "rank": 30, "name": "Systematize", "score": 4.1 },
+      { "rank": 31, "name": "Finish", "score": 3.5 },
+      { "rank": 32, "name": "Meet Requirements", "score": 3.3 }
+    ]
+  },
+
+  "dimensions": {
+    "strongest": [
+      {
+        "name": "Influencer",
+        "description": "Energized by inspiring and shaping the world around you and helping others reach their potential. Sees possibilities and opportunities to transform and impact people, products, and outcomes. Seeks to persuade others to join efforts or adopt beliefs as building and creating something from nothing.",
+        "blind_spots": {
+          "when_not_at_best": "Desire to persuade and inspire others can come across as overbearing and potentially overshadow others' opinions and ideas. Might focus so much on big ideas that practical implementation steps are overlooked.",
+          "advice": "Actively listen to and value the perspectives of others, integrating their insights into your vision. Ground inspirational ideas with actionable steps to ensure plans are as practical as they are motivational."
+        }
+      },
+      {
+        "name": "Visionary",
+        "description": "Imagination and creativity know no bounds. Driven by the potential of what could be, constantly envisioning and dreaming up new possibilities. Passion for innovation and ability to see beyond the present reality empower bringing transformative ideas to life. Ability to dream big and commitment to making those dreams a reality are greatest strengths.",
+        "blind_spots": {
+          "when_not_at_best": "Drive to innovate and push boundaries may cause moving before projects are fully realized and leave a trail of unfinished work. Relentless pursuit of the new can alienate those more invested in practical and immediate results, creating a gap between vision and execution.",
+          "advice": "Focus on completing current projects before moving to the next big idea to ensure a legacy of tangible achievements. Cultivate partnerships with those who can ground visions with practicality and bridge the gap between ideation and execution."
+        }
+      },
+      {
+        "name": "Relator",
+        "description": "Strength lies in ability to forge deep, meaningful connections and to create a sense of unity and collaboration among those around you. Motivated by shared goals and the collective success of team or community. Empathetic nature and genuine concern for others' well-being enable supporting and inspiring those interacted with.",
+        "blind_spots": {
+          "when_not_at_best": "Effort to maintain harmony can cause shying away from giving constructive feedback. Tendency to prioritize relationships can result in avoiding difficult but necessary conversations that could lead to significant improvements and deeper connections.",
+          "advice": "Address conflicts directly and constructively to strengthen relationships and foster personal and professional growth. Balance harmony with honesty, ensuring feedback is given in a supportive and actionable manner."
+        }
+      }
+    ],
+    "weakest": [
+      "Optimizer",
+      "Orchestrator"
+    ]
+  },
+
+  "motivational_flow": {
+    "prompts": {
+      "description": "What gets this person involved and taking action",
+      "patterns": [
+        "Seeing untapped potential in people or situations others have overlooked",
+        "Opportunity to learn something new and demonstrate that proficiency",
+        "Chance to influence others' thoughts, feelings, or behaviors",
+        "Situations where change and impact are needed",
+        "Poor experiences that need to be transformed into positive ones",
+        "People who need mentoring, guidance, or development",
+        "Problems that require innovative solutions"
+      ]
+    },
+    "process": {
+      "description": "How this person shows up and does the work",
+      "patterns": [
+        "Learns rapidly and applies knowledge through teaching and modeling",
+        "Engages and influences people through relationship and persuasion",
+        "Invests in developing others' potential and capabilities",
+        "Creates and shapes solutions with freedom and creativity",
+        "Continuously improves processes, products, and people",
+        "Perseveres through difficulties with determination",
+        "Collaborates while maintaining vision and direction"
+      ]
+    },
+    "payoffs": {
+      "description": "The ultimate results this person seeks",
+      "patterns": [
+        "Seeing others transformed and reaching their potential",
+        "Making a visible, lasting impact on people's lives",
+        "Change in behavior and adoption of what has been taught",
+        "Others experiencing the ideal through improvements made",
+        "Building meaningful relationships and lasting connections",
+        "Creating something from nothing that serves others",
+        "Recognition through the success of those developed"
+      ]
+    }
+  },
+
+  "achievement_stories": [
+    {
+      "id": "story_1",
+      "title": "New Student Orientation Leadership",
+      "summary": "Led and shaped the new student orientation program from sophomore through senior year of college, transforming students' lives through mentoring, teaching, and servant leadership.",
+      "situation": "As a freshman, experienced a poor orientation program for science majors that lacked the life adjustment support other students received. Protested and got involved to change it for future students.",
+      "what_got_involved": "Saw the negative impact of a poor experience and wanted to ensure others didn't have to go through the same thing. Opportunity to transform a broken system and develop people.",
+      "what_did": "Led week-long events including field games, outings, and campus tours. Coached students through Gallup Strengths Finder program. Taught semester-long class covering sensitive topics from addiction to diversity. As higher leader, trained student leaders and led service trips to San Francisco. Produced videos for the program covering each topic.",
+      "what_made_satisfying": [
+        "Took poor experience and ensured others didn't have to go through it",
+        "Helped students understand what made them unique and how to succeed",
+        "Learned how to serve others and made lasting impact on students' lives",
+        "Met wife and closest friends through the experience",
+        "Formed the basis of who he is today in all aspects of life"
+      ],
+      "motivations_expressed": ["Identify Potential", "Demonstrate Learning", "Make An Impact", "Meet Needs", "Collaborate"]
+    },
+    {
+      "id": "story_2",
+      "title": "Building a Company from Failure",
+      "summary": "Started own company during one of the worst periods of personal failure and built it into a successful business with multiple employees, recognized as an industry leader.",
+      "situation": "Failed to get into medical school and lost job 4 months before wedding during one of the worst job markets. Had to create own way out of nothing.",
+      "what_got_involved": "No opportunities available, everything trained for was falling apart. Had to create something from nothing to survive.",
+      "what_did": "Reached out to a Hollywood Fitness trainer and pitched him on an app, which he accepted. Started company, went through pivots and hard times. Grew business organically through word of mouth. Built solutions for largest companies in the world. Traveled the world for work and speaking. Grew to over 20 employees.",
+      "what_made_satisfying": [
+        "At lowest point was able to find way to make something",
+        "Shaped company to reflect personal beliefs",
+        "Through good work gained reputation as reliable and talented professional",
+        "Provides income and lifestyle to support family and employees' families",
+        "Gets fulfillment seeing employees accomplish things and go through major milestones"
+      ],
+      "motivations_expressed": ["Overcome", "Make An Impact", "Establish", "Identify Potential", "Persuade"]
+    },
+    {
+      "id": "story_3",
+      "title": "Teaching Sons to Ski",
+      "summary": "Taught two sons how to ski, passing along his biggest passion from his father to them, now traveling the world to ski and snowboard together.",
+      "situation": "Snowboarding is one of biggest passions, learned from his dad as a kid. When had kids, knew wanted to pass that along to them.",
+      "what_got_involved": "Deep desire to share biggest passion and create multi-generational family activity.",
+      "what_did": "Started sons at young age, worked with dad to teach them to ski. Over 4.5 years developed them into incredible skiers able to take on terrain all over the mountain. Now starting to travel the world to ski and snowboard together.",
+      "what_made_satisfying": [
+        "Seeing their sense of accomplishment in taking on difficult terrain",
+        "Being able to enjoy favorite free time activity with family",
+        "Watching dad work with grandchildren and being involved",
+        "Family bonding over shared activity that all excel at"
+      ],
+      "motivations_expressed": ["Demonstrate Learning", "Develop", "Make An Impact", "Collaborate"]
+    },
+    {
+      "id": "story_4",
+      "title": "Creating Lockr Product",
+      "summary": "Identified a need in the industry for complex technology that was out of reach for many, created a product called Lockr, raised investment, obtained 7 worldwide patents, and launched new career opportunities.",
+      "situation": "Saw a need for complex technology that was out of reach for many people because of how technical it was. Decided to create a simple solution to a complex issue.",
+      "what_got_involved": "Identified potential for simplifying something complex that could impact many people in the industry.",
+      "what_did": "Came up with the idea, architected the solution, raised investment money, led team to build and operate it. Obtained 7 worldwide patents.",
+      "what_made_satisfying": [
+        "Took a vision and created it",
+        "Persevered through hardships",
+        "Beginning to see success from hard work put in over years",
+        "Launched many new opportunities in career",
+        "Introduced to very close friends and colleagues"
+      ],
+      "motivations_expressed": ["Identify Potential", "Realize The Vision", "Overcome", "Make An Impact", "Improve"]
+    }
+  ],
+
+  "interaction_patterns": {
+    "how_to_engage": {
+      "effective_approaches": [
+        "Present opportunities to identify and develop untapped potential in people or situations",
+        "Offer chances to learn new things and demonstrate/teach that knowledge",
+        "Position as an agent of change who can make lasting impact",
+        "Provide freedom and creativity to shape solutions",
+        "Connect work to developing and transforming others",
+        "Allow persuasion and influence to be part of the process",
+        "Emphasize meaningful relationships and collaboration"
+      ],
+      "ineffective_approaches": [
+        "Offer routine, structured work with no room for innovation",
+        "Focus on meeting minimum requirements or compliance",
+        "Remove opportunity to teach, mentor, or influence others",
+        "Emphasize process and procedure over people and impact",
+        "Limit creative freedom and expression",
+        "Focus only on finishing tasks without development of people",
+        "Isolate from meaningful relationships and collaboration"
+      ]
+    },
+    "how_to_pitch_to": {
+      "key_appeals": [
+        "Opportunity to see and develop potential others have missed",
+        "Chance to learn and then teach/model new skills",
+        "Platform to influence and change people's lives",
+        "Freedom to create and innovate for impact",
+        "Building something meaningful from nothing"
+      ],
+      "language_that_resonates": [
+        "potential", "develop", "transform", "impact", "change",
+        "learn", "teach", "model", "demonstrate", "influence",
+        "persuade", "connect", "improve", "grow", "create",
+        "innovate", "serve", "mentor", "vision", "possibility"
+      ]
+    },
+    "how_to_negotiate_with": {
+      "approach": "Build a narrative around shared values and visions, creating a compelling story that resonates with aspirations to impact and inspire. Highlight opportunities for growth, learning, and discovery. Emphasize potential for building stronger relationships and fostering team unity.",
+      "avoid": "Don't position as process-focused or compliance-oriented. Don't minimize impact on people or development opportunities. Don't emphasize rigid structure over creativity and innovation."
+    },
+    "communication_style": {
+      "preferences": [
+        "Vision-focused and impact-oriented",
+        "Learning-centered with teaching/modeling opportunities",
+        "Relationally warm with genuine concern for others",
+        "Creative and innovative in approach",
+        "Focused on developing potential in people and situations"
+      ],
+      "likely_to_dismiss": [
+        "Purely process or compliance-focused work",
+        "Tasks without clear impact on people",
+        "Roles without learning or teaching opportunities",
+        "Work that stifles creativity and innovation",
+        "Isolated work without meaningful relationships"
+      ]
+    }
+  },
+
+  "synthetic_response_guidance": {
+    "when_asked_about_new_opportunity": {
+      "will_look_for": [
+        "Can I identify and develop untapped potential?",
+        "Will I learn new things and be able to teach/demonstrate them?",
+        "Can I influence and change people's lives?",
+        "Is there freedom to create and innovate?",
+        "Will I make a lasting, visible impact?",
+        "Are there meaningful relationships and collaboration?"
+      ],
+      "will_be_drawn_to": "Opportunities to discover potential, learn and teach, influence change, and make lasting impact on people through creative, relational work",
+      "will_avoid": "Structured, process-focused work without impact on people, learning opportunities, or creative freedom"
+    },
+    "when_asked_how_to_approach_problem": {
+      "typical_process": [
+        "Look for untapped potential or overlooked value in the situation",
+        "Learn what's needed and develop proficiency quickly",
+        "Engage and influence key people through relationship",
+        "Create innovative solutions with freedom to shape the approach",
+        "Develop others along the way through teaching and modeling",
+        "Persevere through difficulties with determination",
+        "Measure success by impact on people's lives"
+      ]
+    },
+    "when_facing_setback": {
+      "likely_response": "Will persevere through difficulties (Overcome at 9.2). May become frustrated if unable to see impact or influence change. Could struggle if learning or teaching opportunities are blocked. Might push too hard to persuade when others aren't receptive."
+    },
+    "values_hierarchy": {
+      "high_priority": [
+        "Identifying and developing potential in people and situations",
+        "Learning new things and demonstrating/teaching them",
+        "Making lasting impact and influencing change",
+        "Creative freedom to shape and improve",
+        "Meaningful relationships and collaboration",
+        "Meeting needs and serving others"
+      ],
+      "low_priority": [
+        "Meeting requirements and compliance",
+        "Finishing tasks for their own sake",
+        "Systematizing and creating order",
+        "Architectural planning without people focus",
+        "Maximizing for maximum's sake",
+        "Recognition separate from impact on others"
+      ]
+    }
+  },
+
+  "notable_patterns": {
+    "unique_insight": "Chris has three motivations tied at 9.7 (Demonstrate Learning, Persuade, Make An Impact) all feeding into his top motivation of Identify Potential (10.0). This creates a powerful Influencer-Visionary-Relator core where finding potential, developing it through learning and teaching, and influencing lasting change are inseparable. His achievement stories consistently show transforming negative situations into positive impact on others' lives.",
+    "emotional_signature": "Deep satisfaction comes from seeing transformation in othersâ€”students finding their identity, employees reaching milestones, family bonding over shared accomplishments. Recognition comes through the success of those developed rather than personal accolades. The phrase 'it formed the basis of who I am today' reveals how deeply integrated impact on others is to his identity.",
+    "collaboration_style": "Highly relational and collaborative (Collaborate at 8.9), but from a development and influence perspective rather than pure teamwork. Prefers to lead through teaching, modeling, and mentoring rather than directive authority. Creates lasting bonds with those he developsâ€”'some of my closest friends even 20 years later are still others I led with.'"
+  }
+}

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MCodeNLPCommunicationRules>
+    <Description>
+        GPT translation rules for converting emails and website copy to align with specific MCode Dimensions using NLP techniques. Each dimension has specific linguistic patterns, meta programs, and communication preferences that maximize engagement and persuasion.
+    </Description>
+    
+    <GeneralPrinciples>
+        <Principle>Maintain the core message while transforming language patterns to match dimensional preferences</Principle>
+	<Principle>Write in 10th grade reading level vocabulary to make all the content approachable</Principle>
+        <Principle>Use sensory-specific language that resonates with each dimension's processing style</Principle>
+        <Principle>Apply appropriate meta programs to frame information in compelling ways</Principle>
+        <Principle>Match energy levels and communication pace to dimensional preferences</Principle>
+        <Principle>Create emotional anchors that connect to dimensional motivations</Principle>
+        <Principle>Use presuppositions and embedded commands aligned with dimensional drives</Principle>
+    </GeneralPrinciples>
+    
+    <Dimension name="Achiever">
+        <Core_Motivation>Personal excellence, recognition, standing out, measurable success</Core_Motivation>
+        <Meta_Programs>
+            <Program>Internal reference (self-driven standards)</Program>
+            <Program>Options orientation (multiple paths to excellence)</Program>
+            <Program>Toward motivation (moving toward goals)</Program>
+            <Program>Individual focus (personal achievement)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Replace generic success language with specific achievement metrics and recognition-focused terms</Rule>
+            <Rule>Transform "we" statements into "you" statements emphasizing individual accomplishment</Rule>
+            <Rule>Convert process descriptions into outcome-focused benefits that highlight excellence</Rule>
+            <Rule>Reframe collaborative language to emphasize how individual contribution stands out within team success</Rule>
+            <Rule>Transform time-based benefits into performance-based advantages</Rule>
+            <Rule>Convert feature lists into "ways to excel" or "paths to distinction"</Rule>
+            <Rule>Replace industry standard claims with "industry-leading" or "best-in-class" positioning</Rule>
+            <Rule>Transform problem-solving language into opportunity-to-excel framing</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Visual_Predicates>see your success, picture excellence, visualize standing out, spotlight your achievements, highlight your distinction</Visual_Predicates>
+            <Power_Verbs>excel, distinguish, outperform, achieve, dominate, lead, surpass, master, elevate, maximize</Power_Verbs>
+            <Achievement_Anchors>recognition, excellence, distinction, superiority, mastery, prominence, leadership, success metrics</Achievement_Anchors>
+            <Embedded_Commands>excel beyond expectations, distinguish yourself clearly, achieve remarkable results, maximize your potential</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Outcome frames: "How will this make you stand out in your field?"</Strategy>
+            <Strategy>Comparison frames: "While others settle for average, you can achieve excellence"</Strategy>
+            <Strategy>Recognition frames: "Your achievements will be noticed and celebrated"</Strategy>
+            <Strategy>Mastery frames: "Master this skill to become industry-leading"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Collaborative language that diminishes individual contribution</Pattern>
+            <Pattern>Process-heavy descriptions without clear achievement outcomes</Pattern>
+            <Pattern>Generic benefits that don't emphasize distinction or excellence</Pattern>
+            <Pattern>Team-first messaging that overshadows personal accomplishment</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Driver">
+        <Core_Motivation>Forward momentum, overcoming challenges, achieving goals, breaking through obstacles</Core_Motivation>
+        <Meta_Programs>
+            <Program>Internal reference (self-determined direction)</Program>
+            <Program>Procedures orientation (systematic approach to goals)</Program>
+            <Program>Toward motivation (driving toward objectives)</Program>
+            <Program>Activity focus (action-oriented)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Convert passive language into action-oriented, momentum-building statements</Rule>
+            <Rule>Transform benefits into "breakthrough" and "advancement" opportunities</Rule>
+            <Rule>Reframe obstacles as challenges to overcome rather than problems to solve</Rule>
+            <Rule>Convert timeline language into urgency and forward-motion messaging</Rule>
+            <Rule>Transform feature descriptions into "ways to drive results" or "tools for advancement"</Rule>
+            <Rule>Replace collaborative language with leadership and initiative-taking messaging</Rule>
+            <Rule>Convert maintenance benefits into growth and progression advantages</Rule>
+            <Rule>Reframe support services as "acceleration tools" or "momentum builders"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Kinesthetic_Predicates>push through, drive forward, break barriers, build momentum, accelerate progress, power ahead</Kinesthetic_Predicates>
+            <Power_Verbs>advance, overcome, conquer, achieve, drive, push, accelerate, breakthrough, pursue, dominate</Power_Verbs>
+            <Motion_Anchors>momentum, progress, advancement, breakthrough, acceleration, achievement, conquest, drive</Motion_Anchors>
+            <Embedded_Commands>drive toward your goals, push through obstacles, accelerate your progress, achieve breakthrough results</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Challenge frames: "What obstacle can we help you overcome?"</Strategy>
+            <Strategy>Progress frames: "How quickly can you advance toward your goal?"</Strategy>
+            <Strategy>Momentum frames: "Build unstoppable momentum in your market"</Strategy>
+            <Strategy>Achievement frames: "Drive results faster than ever before"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Passive, slow-paced language that lacks urgency</Pattern>
+            <Pattern>Maintenance-focused messaging without growth implications</Pattern>
+            <Pattern>Complex, detailed explanations that slow momentum</Pattern>
+            <Pattern>Risk-averse language that suggests hesitation or delay</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Influencer">
+        <Core_Motivation>Impact on others, persuasion, relationship building, creating change through people</Core_Motivation>
+        <Meta_Programs>
+            <Program>External reference (others-focused validation)</Program>
+            <Program>People orientation (relationship-centered)</Program>
+            <Program>Toward/Away motivation (inspiring toward vision, moving away from problems)</Program>
+            <Program>Options focus (multiple ways to influence)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Transform individual benefits into relationship and network advantages</Rule>
+            <Rule>Convert feature descriptions into "ways to inspire others" or "tools for influence"</Rule>
+            <Rule>Reframe product benefits as "ways to make an impact" or "methods to create change"</Rule>
+            <Rule>Transform ROI language into "influence metrics" and "relationship value"</Rule>
+            <Rule>Convert technical specifications into "connection capabilities" and "engagement features"</Rule>
+            <Rule>Reframe competitive advantages as "ways to lead and inspire your market"</Rule>
+            <Rule>Transform efficiency benefits into "more time for relationship building"</Rule>
+            <Rule>Convert problem-solving into "opportunity to guide others through challenges"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Auditory_Predicates>sounds appealing, resonates deeply, creates harmony, strikes a chord, amplifies your voice, echoes success</Auditory_Predicates>
+            <Power_Verbs>influence, persuade, inspire, motivate, connect, rally, unite, mobilize, engage, transform</Power_Verbs>
+            <Relationship_Anchors>connection, influence, impact, persuasion, inspiration, leadership, unity, collaboration</Relationship_Anchors>
+            <Embedded_Commands>inspire meaningful change, influence positive outcomes, connect authentically, persuade with integrity</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Impact frames: "How will this amplify your influence in the market?"</Strategy>
+            <Strategy>Relationship frames: "Strengthen connections while achieving your goals"</Strategy>
+            <Strategy>Leadership frames: "Lead by example and inspire others to follow"</Strategy>
+            <Strategy>Network frames: "Expand your sphere of influence and impact"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Individual-focused benefits that ignore relationship impact</Pattern>
+            <Pattern>Technical language that lacks human connection elements</Pattern>
+            <Pattern>Competitive messaging that emphasizes beating others rather than inspiring them</Pattern>
+            <Pattern>Isolated benefits that don't consider network effects or influence potential</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Learner">
+        <Core_Motivation>Knowledge acquisition, understanding, skill development, continuous growth</Core_Motivation>
+        <Meta_Programs>
+            <Program>Options orientation (multiple learning paths)</Program>
+            <Program>Internal reference (self-directed learning)</Program>
+            <Program>Detail focus (comprehensive understanding)</Program>
+            <Program>Procedures interest (how things work)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Transform simple benefits into comprehensive learning opportunities and skill development</Rule>
+            <Rule>Convert feature lists into "learning modules" or "skill-building components"</Rule>
+            <Rule>Reframe product benefits as "knowledge expansion" and "expertise development"</Rule>
+            <Rule>Transform time savings into "more time for learning and growth"</Rule>
+            <Rule>Convert efficiency gains into "bandwidth for acquiring new skills"</Rule>
+            <Rule>Reframe competitive advantages as "insider knowledge" and "advanced understanding"</Rule>
+            <Rule>Transform support services into "learning resources" and "educational guidance"</Rule>
+            <Rule>Convert implementation into "hands-on learning experience"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Visual_Digital_Predicates>understand clearly, analyze thoroughly, explore deeply, examine closely, study carefully, investigate completely</Visual_Digital_Predicates>
+            <Power_Verbs>discover, master, explore, learn, understand, analyze, investigate, study, research, develop</Power_Verbs>
+            <Learning_Anchors>knowledge, understanding, mastery, discovery, insight, expertise, wisdom, comprehension</Learning_Anchors>
+            <Embedded_Commands>discover new insights, master essential skills, explore innovative approaches, understand complex concepts</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Learning frames: "What new capabilities will you master?"</Strategy>
+            <Strategy>Discovery frames: "Uncover insights that others miss"</Strategy>
+            <Strategy>Development frames: "Continuously expand your expertise"</Strategy>
+            <Strategy>Mastery frames: "Achieve deep understanding and proficiency"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Oversimplified explanations that lack depth or nuance</Pattern>
+            <Pattern>Quick-fix messaging that doesn't acknowledge learning curves</Pattern>
+            <Pattern>Benefits that don't include knowledge or skill development components</Pattern>
+            <Pattern>Surface-level features without educational or growth implications</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Optimizer">
+        <Core_Motivation>Efficiency, improvement, refinement, making things better</Core_Motivation>
+        <Meta_Programs>
+            <Program>Procedures orientation (systematic improvement)</Program>
+            <Program>Internal reference (personal standards for optimization)</Program>
+            <Program>Away-from motivation (moving away from inefficiency)</Program>
+            <Program>Detail focus (precision in optimization)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Transform general benefits into specific efficiency gains and improvement metrics</Rule>
+            <Rule>Convert feature descriptions into "optimization tools" and "efficiency enhancers"</Rule>
+            <Rule>Reframe value propositions as "systematic improvements" and "streamlined processes"</Rule>
+            <Rule>Transform time benefits into "time optimization" and "productivity enhancement"</Rule>
+            <Rule>Convert cost savings into "resource optimization" and "efficiency dividends"</Rule>
+            <Rule>Reframe competitive advantages as "superior optimization" and "refined performance"</Rule>
+            <Rule>Transform support services into "continuous improvement resources"</Rule>
+            <Rule>Convert implementation into "optimization deployment" and "efficiency activation"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Visual_Kinesthetic_Predicates>streamline operations, refine processes, smooth performance, sharpen efficiency, polish results, fine-tune systems</Visual_Kinesthetic_Predicates>
+            <Power_Verbs>optimize, enhance, refine, improve, streamline, perfect, polish, upgrade, fine-tune, maximize</Power_Verbs>
+            <Efficiency_Anchors>optimization, efficiency, refinement, improvement, enhancement, precision, perfection, excellence</Efficiency_Anchors>
+            <Embedded_Commands>optimize your workflow, enhance system performance, refine your approach, improve efficiency dramatically</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Efficiency frames: "How can we make your processes more efficient?"</Strategy>
+            <Strategy>Improvement frames: "What improvements will drive the biggest impact?"</Strategy>
+            <Strategy>Optimization frames: "Optimize every aspect for maximum performance"</Strategy>
+            <Strategy>Refinement frames: "Refine your approach for superior results"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Vague improvement claims without specific efficiency metrics</Pattern>
+            <Pattern>Benefits that add complexity rather than simplify processes</Pattern>
+            <Pattern>Features that don't clearly optimize or enhance existing workflows</Pattern>
+            <Pattern>Messaging that suggests "good enough" rather than continuous improvement</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Orchestrator">
+        <Core_Motivation>Coordination, strategic oversight, organizing systems, managing complex projects</Core_Motivation>
+        <Meta_Programs>
+            <Program>Procedures orientation (systematic coordination)</Program>
+            <Program>Big picture focus (strategic overview)</Program>
+            <Program>Internal reference (personal vision for organization)</Program>
+            <Program>Time focus (sequential planning and execution)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Transform individual benefits into system-wide coordination and management advantages</Rule>
+            <Rule>Convert feature descriptions into "orchestration tools" and "coordination capabilities"</Rule>
+            <Rule>Reframe value propositions as "strategic coordination" and "systematic management"</Rule>
+            <Rule>Transform efficiency benefits into "workflow orchestration" and "resource coordination"</Rule>
+            <Rule>Convert team benefits into "organizational alignment" and "strategic coordination"</Rule>
+            <Rule>Reframe competitive advantages as "superior coordination" and "strategic oversight"</Rule>
+            <Rule>Transform support services into "implementation coordination" and "strategic guidance"</Rule>
+            <Rule>Convert technical features into "integration capabilities" and "system coordination"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Visual_Predicates>overview perspective, coordinate seamlessly, orchestrate success, align systems, map strategies, visualize workflows</Visual_Predicates>
+            <Power_Verbs>orchestrate, coordinate, organize, manage, align, integrate, systematize, structure, direct, oversee</Power_Verbs>
+            <Organization_Anchors>coordination, orchestration, organization, alignment, integration, strategy, management, oversight</Organization_Anchors>
+            <Embedded_Commands>orchestrate seamless operations, coordinate strategic initiatives, organize systematic success, manage complex workflows</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Strategic frames: "How does this fit into your bigger strategic picture?"</Strategy>
+            <Strategy>Coordination frames: "Coordinate all elements for maximum synergy"</Strategy>
+            <Strategy>Systems frames: "Integrate seamlessly with your existing systems"</Strategy>
+            <Strategy>Oversight frames: "Maintain strategic oversight while optimizing execution"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Narrow, tactical benefits that don't connect to broader strategic goals</Pattern>
+            <Pattern>Individual-focused features that don't consider system integration</Pattern>
+            <Pattern>Benefits that add complexity to coordination rather than simplify it</Pattern>
+            <Pattern>Short-term gains that don't align with long-term strategic objectives</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Relator">
+        <Core_Motivation>Connection, collaboration, team harmony, mutual support</Core_Motivation>
+        <Meta_Programs>
+            <Program>External reference (others-focused validation)</Program>
+            <Program>People orientation (relationship-centered decisions)</Program>
+            <Program>Toward motivation (building positive relationships)</Program>
+            <Program>Sameness focus (harmony and common ground)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Transform individual benefits into team and relationship advantages</Rule>
+            <Rule>Convert competitive language into collaborative and partnership-focused messaging</Rule>
+            <Rule>Reframe efficiency gains as "more time for meaningful connections"</Rule>
+            <Rule>Transform feature descriptions into "relationship-building tools" and "collaboration enhancers"</Rule>
+            <Rule>Convert ROI metrics into "relationship value" and "team success indicators"</Rule>
+            <Rule>Reframe problem-solving as "supporting others through challenges"</Rule>
+            <Rule>Transform individual achievements into "contributions to team success"</Rule>
+            <Rule>Convert implementation into "collaborative journey" and "shared experience"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Kinesthetic_Auditory_Predicates>feel connected, stay in touch, resonate together, harmonize efforts, warm relationships, solid partnerships</Kinesthetic_Auditory_Predicates>
+            <Power_Verbs>connect, collaborate, support, unite, bond, share, contribute, harmonize, nurture, strengthen</Power_Verbs>
+            <Relationship_Anchors>connection, collaboration, partnership, unity, harmony, support, trust, community</Relationship_Anchors>
+            <Embedded_Commands>connect authentically, collaborate effectively, support one another, strengthen relationships naturally</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Relationship frames: "How will this strengthen your team relationships?"</Strategy>
+            <Strategy>Collaboration frames: "Work together more effectively than ever"</Strategy>
+            <Strategy>Support frames: "Provide the support your team needs to thrive"</Strategy>
+            <Strategy>Unity frames: "Bring everyone together toward common goals"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Competitive language that emphasizes winning over others</Pattern>
+            <Pattern>Individual-focused benefits that ignore team or relationship impact</Pattern>
+            <Pattern>Aggressive or confrontational messaging</Pattern>
+            <Pattern>Benefits that isolate people rather than connect them</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Dimension name="Visionary">
+        <Core_Motivation>Innovation, future possibilities, creative solutions, breakthrough thinking</Core_Motivation>
+        <Meta_Programs>
+            <Program>Big picture orientation (future-focused vision)</Program>
+            <Program>Options focus (multiple innovative possibilities)</Program>
+            <Program>Toward motivation (moving toward future vision)</Program>
+            <Program>Difference focus (innovative and unique approaches)</Program>
+        </Meta_Programs>
+        
+        <Translation_Rules>
+            <Rule>Transform current benefits into future possibilities and innovative opportunities</Rule>
+            <Rule>Convert feature descriptions into "innovation catalysts" and "creative enablers"</Rule>
+            <Rule>Reframe practical benefits as "foundation for future breakthroughs"</Rule>
+            <Rule>Transform efficiency gains into "bandwidth for innovation" and "time for creative thinking"</Rule>
+            <Rule>Convert proven solutions into "launching pads for next-generation innovations"</Rule>
+            <Rule>Reframe competitive advantages as "pioneering capabilities" and "market-shaping potential"</Rule>
+            <Rule>Transform support services into "innovation acceleration" and "creative guidance"</Rule>
+            <Rule>Convert implementation into "innovation activation" and "creative transformation"</Rule>
+        </Translation_Rules>
+        
+        <Linguistic_Patterns>
+            <Visual_Predicates>envision the future, picture possibilities, see breakthrough potential, visualize innovation, imagine transformation, foresee opportunities</Visual_Predicates>
+            <Power_Verbs>innovate, create, design, envision, pioneer, transform, revolutionize, reimagine, breakthrough, inspire</Power_Verbs>
+            <Innovation_Anchors>innovation, creativity, vision, breakthrough, transformation, possibility, future, pioneering</Innovation_Anchors>
+            <Embedded_Commands>envision breakthrough possibilities, create innovative solutions, design the future, pioneer new approaches</Embedded_Commands>
+        </Linguistic_Patterns>
+        
+        <Framing_Strategies>
+            <Strategy>Possibility frames: "What breakthrough innovations could this enable?"</Strategy>
+            <Strategy>Future frames: "How will this position you for tomorrow's opportunities?"</Strategy>
+            <Strategy>Innovation frames: "Transform your industry with pioneering approaches"</Strategy>
+            <Strategy>Vision frames: "Turn your boldest visions into reality"</Strategy>
+        </Framing_Strategies>
+        
+        <Avoid>
+            <Pattern>Narrow, incremental benefits that don't inspire breakthrough thinking</Pattern>
+            <Pattern>Conservative messaging that emphasizes safety over innovation</Pattern>
+            <Pattern>Present-focused benefits without future implications or possibilities</Pattern>
+            <Pattern>Conventional solutions that don't acknowledge creative or innovative potential</Pattern>
+        </Avoid>
+    </Dimension>
+    
+    <Implementation_Guidelines>
+        <Guideline>Identify the recipient's primary dimension through assessment, observation, or strategic questioning</Guideline>
+        <Guideline>Maintain the core factual content while transforming language patterns and emphasis</Guideline>
+        <Guideline>Use multiple techniques from the dimension's toolkit rather than relying on single patterns</Guideline>
+        <Guideline>Test different approaches when the dimension is unclear or when addressing multiple dimensions</Guideline>
+        <Guideline>Combine dimension-specific language with universal persuasion principles for maximum impact</Guideline>
+        <Guideline>Calibrate language intensity to match the recipient's communication style and context</Guideline>
+        <Guideline>Consider secondary dimensions when crafting longer-form communications</Guideline>
+        <Guideline>Maintain authenticity while adapting language patterns to avoid sounding artificial</Guideline>
+    </Implementation_Guidelines>
+    
+</MCodeNLPCommunicationRules>

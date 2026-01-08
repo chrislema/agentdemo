@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MCodeMotivations>
+    <Motivation name="Advance">
+        <Description>Motivated by the experience of making progress as a series of goals are accomplished.</Description>
+        <Characteristics>
+            <ShowsUpAs>Mover, Clarity, Improve, Momentum</ShowsUpAs>
+            <Strengths>Brings new ideas and possibilities, creates new trends and movements, builds momentum, finds ways forward when stuck.</Strengths>
+            <ThrivesIn>Environments that promote personal growth, have innovation and cutting-edge strategies, vision for the future, and goal-driven culture.</ThrivesIn>
+            <StrugglesIn>Environments where upward movement is not rewarded, products are commoditized, or career paths are undefined.</StrugglesIn>
+            <FlipSide>The need for forward movement could cause them to miss present day opportunities and lead to discontent in their current position.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Architect">
+        <Description>Motivated by creating a plan using technical expertise, then advising and overseeing specialists in the execution of that plan.</Description>
+        <Characteristics>
+            <ShowsUpAs>Blueprint, Mastermind, Guru, Director</ShowsUpAs>
+            <Strengths>Brings clarity and direction, crafts comprehensive plans, translates ideas into workable plans, builds complex structures.</Strengths>
+            <ThrivesIn>Environments where master plans are developed, specialized teams need oversight, visions become reality through planning, and technical expertise is necessary.</ThrivesIn>
+            <StrugglesIn>Environments without specialized teams, where building or creating is not the focus, or there's no opportunity for leadership.</StrugglesIn>
+            <FlipSide>Due to their expertise and big-picture understanding, they could appear dismissive or arrogant when responding to those without similar capabilities.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Be Key">
+        <Description>Motivated to be a key person who holds things together and gives meaning and/or direction to the work.</Description>
+        <Characteristics>
+            <ShowsUpAs>Trustworthy, Reliable, The Hub, Key</ShowsUpAs>
+            <Strengths>Provides direction, builds momentum, plays critical roles in organizational success, takes on challenging roles.</Strengths>
+            <ThrivesIn>Project-oriented environments, team-focused work, opportunities to lead and give direction, roles where they can stand out.</ThrivesIn>
+            <StrugglesIn>Environments where they are one of many doing the same tasks, authoritative or "flat" operations, highly collaborative settings.</StrugglesIn>
+            <FlipSide>Their desire to be key and do it all could lead to burnout and minimizing others' contributions.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Be Unique">
+        <Description>Motivated to be distinctive by displaying a talent, quality or aspect that is extraordinary and different from others.</Description>
+        <Characteristics>
+            <ShowsUpAs>Self-expression, Extraordinary, Non-conformist, Distinct</ShowsUpAs>
+            <Strengths>Innovates, unafraid to be different, sees distinction where others don't, has cutting-edge ideas.</Strengths>
+            <ThrivesIn>Environments that promote autonomy and flexibility, allow creativity, offer opportunities to stand out, and value novelty.</ThrivesIn>
+            <StrugglesIn>Highly structured environments, high-volume or process-oriented work, roles where many people do the same work.</StrugglesIn>
+            <FlipSide>Their desire to be unique could lead to rebelling against conformity or introducing unrealistic ideas just to be different.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Collaborate">
+        <Description>Motivated to be closely involved with others in contributing to common goals and vision.</Description>
+        <Characteristics>
+            <ShowsUpAs>Propel, Satisfaction, Values, Importance</ShowsUpAs>
+            <Strengths>Clarifies team vision/mission, incorporates individuals into teams, encourages community values, builds relationships.</Strengths>
+            <ThrivesIn>Environments where group work is common, social/relational aspects are promoted, there are shared goals and collaboration, and communication is essential.</ThrivesIn>
+            <StrugglesIn>Environments where independent work is primary, authority and rank are important, or there's little time for relating to others.</StrugglesIn>
+            <FlipSide>Their instinct to work with others could make them appear judgmental of individualists or prioritize group needs over their own.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Comprehend and Express">
+        <Description>Motivated to understand, define, and then communicate their insights.</Description>
+        <Characteristics>
+            <ShowsUpAs>Learn, Expertise, Apply, Communicate</ShowsUpAs>
+            <Strengths>Communicates complexities clearly, pushes knowledge boundaries, models beliefs, develops explanatory models.</Strengths>
+            <ThrivesIn>Environments where learning is part of work, opportunities to present knowledge exist, high expertise is required, and conceptual work needs application.</ThrivesIn>
+            <StrugglesIn>Simple or monotonous work environments, where personal expression isn't essential, or where time and idea integration are constrained.</StrugglesIn>
+            <FlipSide>Their hunger for knowledge can leave them bored when not learning, and they may struggle with decision-making due to analysis needs.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Demonstrate Learning">
+        <Description>Motivated to learn how to do something new and then show that they can do it.</Description>
+        <Characteristics>
+            <ShowsUpAs>Model, Practice, Example, Experiment</ShowsUpAs>
+            <Strengths>Inspires others to try new things, mentors through modeling, puts ideas into practice, demonstrates knowledge effectively.</Strengths>
+            <ThrivesIn>Environments where learning and personal growth are essential, learning is applied, there are opportunities to present findings, and teaching is possible.</ThrivesIn>
+            <StrugglesIn>Environments with less flexibility for change, where work is rigidly defined, individualism isn't valued, or advancement opportunities are limited.</StrugglesIn>
+            <FlipSide>May feel discontent unless continuously learning and might be frustrated if others don't adopt what they've learned.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Design">
+        <Description>Motivated to take a vision or "big picture" plan and giving it form, feeling, and depth through a creative design.</Description>
+        <Characteristics>
+            <ShowsUpAs>Creator, Translator, Dot-to-dot, Blank Slate</ShowsUpAs>
+            <Strengths>Gives artistic expression to ideas, elevates appeal, brings new realities to life, reveals multiple possibilities through creativity.</Strengths>
+            <ThrivesIn>Environments where innovation and creativity are central, visions can be established through artistic mediums, in start-up phases, or where clients need vision fulfillment.</ThrivesIn>
+            <StrugglesIn>Environments where originality is prohibited, independent work isn't primary, or others significantly modify original designs.</StrugglesIn>
+            <FlipSide>Could become rigid about their designs, dismissing feedback, or get stuck in the design phase, struggling to complete work.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Develop">
+        <Description>Motivated to create the process of building and developing from start to finish.</Description>
+        <Characteristics>
+            <ShowsUpAs>Bridge, The Journey, Finish, Connect</ShowsUpAs>
+            <Strengths>Advances civilization, builds from scratch, creates spaces for purposes, unifies disconnected elements.</Strengths>
+            <ThrivesIn>Environments with opportunities to engineer products or processes, take projects from conception to completion, or transform complex processes into platforms.</ThrivesIn>
+            <StrugglesIn>Environments focused on fixing or improving existing things, where projects remain unfinished, or tasks are overly simple and established.</StrugglesIn>
+            <FlipSide>May want hands-on involvement in every project stage, even if it's beyond their role, and might distance themselves from projects not requiring ongoing development.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Do It Right">
+        <Description>Motivated to consistently set up or follow certain standards, procedures and principles.</Description>
+        <Characteristics>
+            <ShowsUpAs>Parameters, Standards, Clarity, Integrity</ShowsUpAs>
+            <Strengths>Models character and commitment, produces precise and reliable work, sets standards for change and justice.</Strengths>
+            <ThrivesIn>Environments with precisely defined roles, emphasis on detail and process, focus on measuring outcomes, and clear values and beliefs.</ThrivesIn>
+            <StrugglesIn>Environments requiring high adaptability, where precision or quality assurance isn't critical, or where standards and processes aren't highly valued.</StrugglesIn>
+            <FlipSide>Due to strong convictions, may struggle to compromise and be overly strict or critical of others with different perspectives.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Establish">
+        <Description>Motivated to lay secure foundations and to be foundational.</Description>
+        <Characteristics>
+            <ShowsUpAs>Endurance, Completion, Foundation, Reputation</ShowsUpAs>
+            <Strengths>Leaves impactful legacies, builds confidence in uncertain times, solves foundational problems, provides solutions to core issues.</Strengths>
+            <ThrivesIn>Environments valuing enduring creations, loyalty, clearly defined roles and accountability, and emphasis on process and planning.</ThrivesIn>
+            <StrugglesIn>Ambiguous environments lacking structure, roles requiring cross-functional work, or settings with collective, open-ended decision-making.</StrugglesIn>
+            <FlipSide>Might dismiss new ideas or innovations due to their preference for strong foundations, and could lack respect for less experienced leaders.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Evoke Recognition">
+        <Description>Motivated to capture the attention and interest of others.</Description>
+        <Characteristics>
+            <ShowsUpAs>Spotlight, Attraction, Response, Perception</ShowsUpAs>
+            <Strengths>Draws out appreciation for beauty, raises recognition for causes, takes on inspiring roles, impacts others through aesthetics.</Strengths>
+            <ThrivesIn>Competitive environments, settings with clear audiences, where impact is measurable, and roles with performance or public relations elements.</ThrivesIn>
+            <StrugglesIn>Environments where individual contributions don't stand out, aren't easily measured, or where being central isn't highlighted.</StrugglesIn>
+            <FlipSide>Their passion for standing out may lead to losing awareness of others' need to shine and disappointment if they don't receive expected recognition.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Excel">
+        <Description>Motivated to give their absolute best as they exceed performance and expectations.</Description>
+        <Characteristics>
+            <ShowsUpAs>Victory, Going Beyond, First, Perfectionist</ShowsUpAs>
+            <Strengths>Contributes as a high performer, breaks through limitations, sets standards for healthy competition, raises quality benchmarks.</Strengths>
+            <ThrivesIn>Environments that reward exceeding expectations, equate competition with thriving, offer opportunities to stand out, and brand high quality.</ThrivesIn>
+            <StrugglesIn>Environments where results aren't "A-level", excellence isn't essential, or products and services are primarily value-oriented.</StrugglesIn>
+            <FlipSide>Could become excessively competitive and overly concerned with personal performance, resulting in unrealistic standards.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Experience the Ideal">
+        <Description>Motivated to give concrete expression to certain concepts, visions, or values that are important.</Description>
+        <Characteristics>
+            <ShowsUpAs>Purpose, Integrity, Reality, Model</ShowsUpAs>
+            <Strengths>Innovates to enrich life, drives positive social change, models living out values, brings big dreams to life.</Strengths>
+            <ThrivesIn>Environments with highly developed vision and ambition, opportunities to create practical applications for ideas, and where values are lived out.</ThrivesIn>
+            <StrugglesIn>Environments with established systems and processes, where products or services are tangible and set, or where there's little freedom to incorporate vision and values.</StrugglesIn>
+            <FlipSide>Can be overly idealistic, romanticizing ideas not grounded in reality, and may become discouraged if they don't see immediate change from demonstrating their values.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Explore">
+        <Description>Motivated to press beyond the existing limits of their knowledge and experience to discover what is unknown to them.</Description>
+        <Characteristics>
+            <ShowsUpAs>Curious, Discovery, Dynamic, Limitless</ShowsUpAs>
+            <Strengths>Expands society's knowledge, pushes boundaries for common good, fuels imaginations, broadens horizons.</Strengths>
+            <ThrivesIn>Environments allowing outward-bound work, involving some risk-taking, where research is core, and adventure is incorporated.</ThrivesIn>
+            <StrugglesIn>Highly prescriptive roles, environments with well-established routines, or where autonomy and independence aren't essential.</StrugglesIn>
+            <FlipSide>Too many constraints, routines, or over-management could become unsatisfying, hindering their ability to push boundaries of new ideas.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Finish">
+        <Description>Motivated to look at a final or finished product and know that they have met the objective they set out to accomplish.</Description>
+        <Characteristics>
+            <ShowsUpAs>Finish Line, Target, Checkmark, Reflection</ShowsUpAs>
+            <Strengths>Encourages perseverance, completes tasks, finds joy in finishing loose ends, helps focus people on the future.</Strengths>
+            <ThrivesIn>Project-oriented environments, settings with well-defined plans and step-by-step outlines, opportunities to review completed work.</ThrivesIn>
+            <StrugglesIn>Roles not clearly defined from start to finish, ongoing tasks without clear endpoints, or atypical work paths.</StrugglesIn>
+            <FlipSide>Their focus on task completion could make them easily annoyed by interruptions and unable to enjoy the process or stay present.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Gain Ownership">
+        <Description>Motivated to acquire what they want and exercise ownership or control over what is theirs.</Description>
+        <Characteristics>
+            <ShowsUpAs>Gather, Accomplished, Rule-maker, Ownership</ShowsUpAs>
+            <Strengths>Demonstrates value of hard work and reward, shares fruits of labor, models care-taking, raises value of property or services.</Strengths>
+            <ThrivesIn>Environments allowing business ownership or investment, partnerships with shared interests and revenue, roles with significant individual control.</ThrivesIn>
+            <StrugglesIn>Settings where things are publicly owned and controlled, no vested interest in profit is allowed, or personal oversight is lacking.</StrugglesIn>
+            <FlipSide>Their drive to control and own could lead to becoming possessive, over-controlling, or territorial.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Identify Potential">
+        <Description>Motivated to uncover, discover, and harness untapped possibilities and latent talent.</Description>
+        <Characteristics>
+            <ShowsUpAs>Dig, Search, Retrieve, Reveal</ShowsUpAs>
+            <Strengths>Helps others reach full potential, uncovers hidden value, sees potential in others, envisions realistic possibilities.</Strengths>
+            <ThrivesIn>Environments with new prospects, where possibility-thinking is promoted, cultures that bring out the best in people, and value personal growth.</ThrivesIn>
+            <StrugglesIn>Settings with little investment in developing people, focus solely on refining existing elements, or where envisioning new possibilities is stifled.</StrugglesIn>
+            <FlipSide>Their tendency to see potential in everything could lead to poor investments of resources that never come to fruition.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Improve">
+        <Description>Motivated to consistently make things better and enhance them.</Description>
+        <Characteristics>
+            <ShowsUpAs>Lookout, Expert, Skilled, Refine</ShowsUpAs>
+            <Strengths>Lifts morale, creates greater efficiency, sets example to exceed status quo, attentive to improving environment.</Strengths>
+            <ThrivesIn>Environments where skills are developed, personal growth is promoted, functionality is being enhanced, and management invests in employees.</ThrivesIn>
+            <StrugglesIn>Settings where processes aren't highly developed, there's a strong sense of tradition, or products/services are already highly developed.</StrugglesIn>
+            <FlipSide>May be overly critical of existing standards, pushing against the status quo, potentially stepping on others' toes with unwanted advice.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Make an Impact">
+        <Description>Motivated to shape and impact the world around them.</Description>
+        <Characteristics>
+            <ShowsUpAs>Difference, Creativity, Connection, World-changer</ShowsUpAs>
+            <Strengths>Creates life-changing products/services, brings transformation, mentors others, introduces impactful ideas.</Strengths>
+            <ThrivesIn>Environments focused on people, aiming for high degrees of change, welcoming individual expression, with ambitious visions.</ThrivesIn>
+            <StrugglesIn>Task and process-focused companies, settings with limited creative freedom, or where immediate results aren't visible.</StrugglesIn>
+            <FlipSide>Might try to make a difference when not needed, or be overly compelled to make work about their personal desires.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Make It Work">
+        <Description>Motivated to fix something that is broken or functioning improperly.</Description>
+        <Characteristics>
+            <ShowsUpAs>Function, Solutions, Repair, Fix</ShowsUpAs>
+            <Strengths>Restores things to pristine condition, increases efficiency, solves major issues, brings creative solutions to challenges.</Strengths>
+            <ThrivesIn>Environments focused on fixing relationships or things, needing problem-solving, valuing repair services, prioritizing customer service.</ThrivesIn>
+            <StrugglesIn>Settings where concepts are frequently discarded, fixing is not cost-effective, or self-awareness about problems is not valued.</StrugglesIn>
+            <FlipSide>Might create or exaggerate problems where none exist, and may be frustrated with routine maintenance activities.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Make the Team">
+        <Description>Motivated to measure up to standards and thereby gain acceptance into a group or team.</Description>
+        <Characteristics>
+            <ShowsUpAs>Standards-driven, Requirements, Rank, Together</ShowsUpAs>
+            <Strengths>Models high standards, promotes high-performing teams, fosters shared identity, demonstrates group norms.</Strengths>
+            <ThrivesIn>Environments with high customer standards, valuing elite teams, focusing on performance measurement, perceived as best-in-class.</ThrivesIn>
+            <StrugglesIn>Settings where one starts at the bottom, rank isn't valued, roles are uniform, or requirements for outstanding work are undefined.</StrugglesIn>
+            <FlipSide>May lose sight of individuality due to group focus, feeling disappointed when the group doesn't meet expected standards.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Mastery">
+        <Description>Motivated to gain complete command of a skill, subject, procedure, technique or process.</Description>
+        <Characteristics>
+            <ShowsUpAs>Learning, Depth, Practice, Success</ShowsUpAs>
+            <Strengths>Demonstrates high performance, shows value of focus, inspires through expertise, encourages proficiency in others.</Strengths>
+            <ThrivesIn>Environments requiring high competency, valuing complete knowledge, promoting continual learning, aiming for perfection.</ThrivesIn>
+            <StrugglesIn>Settings where deep expertise isn't required, individual contributions aren't valued, or teamwork is prioritized over individual mastery.</StrugglesIn>
+            <FlipSide>Drive for expertise could lead to perfectionism, slowing progress and causing constant dissatisfaction with achievements.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Maximize">
+        <Description>Motivated to get the most out of something or someone, making things as successful or great as possible.</Description>
+        <Characteristics>
+            <ShowsUpAs>Pushing, Greater, Limitless, Expand</ShowsUpAs>
+            <Strengths>Sets high goals, takes things to highest level, elevates possibilities beyond status quo, inspires others to excel.</Strengths>
+            <ThrivesIn>Environments desiring growth, focusing on expanding operations, valuing impact on growth, oriented towards optimal results.</ThrivesIn>
+            <StrugglesIn>Settings averse to risk or change, focused on incremental growth, or discouraging boundary-pushing.</StrugglesIn>
+            <FlipSide>Tendency to drive for maximum results could lead to overly ambitious, unrealistic goals, disappointing or frustrating others.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Meet Needs">
+        <Description>Motivated to identify and fulfill needs.</Description>
+        <Characteristics>
+            <ShowsUpAs>Helper, First Responder, Gaps, Available</ShowsUpAs>
+            <Strengths>Models selflessness, enriches others' lives, inspires sacrificial contributions, demonstrates humility.</Strengths>
+            <ThrivesIn>Service-oriented environments, settings with client/customer engagement, serving-based cultures, work that makes a difference.</ThrivesIn>
+            <StrugglesIn>Environments not focused on people's needs, with limited resources for serving others, or lacking opportunities to fulfill needs.</StrugglesIn>
+            <FlipSide>Intent to serve others could lead to neglecting self-care, resulting in exhaustion or resentment if efforts aren't reciprocated.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Meet Requirements">
+        <Description>Motivated to fulfill expectations, giving them a deep sense of accomplishment.</Description>
+        <Characteristics>
+            <ShowsUpAs>Assessor, Forecasting, Clarity, Prize</ShowsUpAs>
+            <Strengths>Brings clarity to expectations, helps others understand success benchmarks, fulfills needed work, delivers exactly what's requested.</Strengths>
+            <ThrivesIn>Environments with clear objectives, management direction, regularly updated expectations, focus on execution and maintenance.</ThrivesIn>
+            <StrugglesIn>Settings with little performance feedback, minimal initial direction, or open-ended, self-guided objectives.</StrugglesIn>
+            <FlipSide>Satisfaction in meeting requirements can lead to unease or frustration when expectations are unclear or ambiguous.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Meet the Challenge">
+        <Description>Motivated to experience a sense of achievement by looking back over challenges they have met.</Description>
+        <Characteristics>
+            <ShowsUpAs>Pressure, Competition, Deadlines, Achievement</ShowsUpAs>
+            <Strengths>Inspires others to tackle difficulties, models perseverance, pushes boundaries of possibility, motivates through challenges.</Strengths>
+            <ThrivesIn>Environments with clear goals and challenges, high expectations, demanding work, and cultures of reflection and evaluation.</ThrivesIn>
+            <StrugglesIn>Settings lacking difficulty or demand, with overly simple or routine work, or where problem-solving isn't valued.</StrugglesIn>
+            <FlipSide>Might create unnecessary pressure or stress to challenge themselves, potentially pushing beyond current abilities.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Overcome">
+        <Description>Motivated to persevere through difficulties, oppositions or disadvantages.</Description>
+        <Characteristics>
+            <ShowsUpAs>On-Fire, Give 120%, Combat, Grind</ShowsUpAs>
+            <Strengths>Inspires others to tackle the impossible, models human perseverance, blazes trails for others, unrelenting in face of fear.</Strengths>
+            <ThrivesIn>Environments with extreme challenges, focus on "impossible" tasks, rewards for perseverance, missions defined as working against something.</ThrivesIn>
+            <StrugglesIn>Settings where work is easily accomplished, products don't serve critical outcomes, or high aspirations and risks aren't involved.</StrugglesIn>
+            <FlipSide>Might create or seek problems where none exist, inviting unnecessary competition, pressure, and stress into their life.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Persuade">
+        <Description>Motivated to influence someone's thoughts, feelings or behaviors.</Description>
+        <Characteristics>
+            <ShowsUpAs>Engage, Push, Reactions, Influential</ShowsUpAs>
+            <Strengths>Promotes new perspectives, changes minds and hearts, unifies ideas, fosters favorable outcomes.</Strengths>
+            <ThrivesIn>Environments where sales is critical, interaction and ideas matter, persuasion is part of the culture, and change is welcomed.</ThrivesIn>
+            <StrugglesIn>Settings without established culture/values, dominated by mass production/automation, or focused solely on process and procedure.</StrugglesIn>
+            <FlipSide>Tendency to focus on others' responses might lead to overselling ideas, potentially distracting from the work at hand.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Realize the Vision">
+        <Description>Motivated by taking a vision or concept and making it a reality.</Description>
+        <Characteristics>
+            <ShowsUpAs>Imagineer, Practical, Big Ideas, Implement</ShowsUpAs>
+            <Strengths>Brings others' dreams to life, provides practical strategies, grounds possibilities in reality, helps refine ideas.</Strengths>
+            <ThrivesIn>Environments creating practical applications for ideas, valuing brainstorming and execution, supporting innovative strategies.</ThrivesIn>
+            <StrugglesIn>Settings that reward vision without execution, focus on mundane tasks, or have rigid structures limiting creative ideation.</StrugglesIn>
+            <FlipSide>Might push new ideas too quickly without considering alternatives, risking disappointment when initiatives don't materialize.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Systematize">
+        <Description>Motivated by setting up a smooth-running operation.</Description>
+        <Characteristics>
+            <ShowsUpAs>Puzzlemaster, Control, Plan, Team Leader</ShowsUpAs>
+            <Strengths>Brings order to chaos, promotes efficient teamwork, attends to overlooked details, creates meaningful workflow.</Strengths>
+            <ThrivesIn>Structured and organized environments, settings valuing process and order, opportunities to bring meaning to tasks and people.</ThrivesIn>
+            <StrugglesIn>Environments where controls aren't valued, work is overly simple, or there's little direct impact on people or projects.</StrugglesIn>
+            <FlipSide>Desire for smooth systems might lead to over-complicating processes, potentially causing over-extension or over-commitment.</FlipSide>
+        </Characteristics>
+    </Motivation>
+    
+    <Motivation name="Take Charge">
+        <Description>Motivated by being in charge of personal destiny, areas and activities, and directing areas and activities of others.</Description>
+        <Characteristics>
+            <ShowsUpAs>Leader, Order, Independence, Guide</ShowsUpAs>
+            <Strengths>Guides through uncertainty, provides direction when needed, takes responsibility in difficulties, puts reputation on line for others.</Strengths>
+            <ThrivesIn>Environments involving critical processes, needing strong leadership, requiring precision, allowing for independence and defined domains.</ThrivesIn>
+            <StrugglesIn>Settings with dispersed leadership, requiring personal influence for decisions, or viewing power/authority negatively.</StrugglesIn>
+            <FlipSide>Natural tendency to take charge might lead to overstepping boundaries or appearing too aggressive in certain situations.</FlipSide>
+        </Characteristics>
+    </Motivation>
+</MCodeMotivations>
