@@ -20,6 +20,8 @@ defmodule BookReportDemo.Application do
       # Phase 3: LLM agents
       BookReportDemo.Agents.DepthExpert,
       BookReportDemo.Agents.Interviewer,
+      # Phase 4: Coordinator
+      BookReportDemo.Coordinator,
       # Start to serve requests, typically the last entry
       BookReportDemoWeb.Endpoint
     ]
