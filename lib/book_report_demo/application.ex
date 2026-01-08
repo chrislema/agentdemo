@@ -14,6 +14,9 @@ defmodule BookReportDemo.Application do
       # Interview state and ticker
       BookReportDemo.InterviewState,
       BookReportDemo.Ticker,
+      # Phase 2: Pure Elixir agents
+      BookReportDemo.Agents.Timekeeper,
+      BookReportDemo.Agents.Grader,
       # Start to serve requests, typically the last entry
       BookReportDemoWeb.Endpoint
     ]
