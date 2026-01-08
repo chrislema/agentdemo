@@ -17,7 +17,7 @@ defmodule BookReportDemoWeb.Router do
   scope "/", BookReportDemoWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", InterviewLive
   end
 
   # Other scopes may use custom stacks.
