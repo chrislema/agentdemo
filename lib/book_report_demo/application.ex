@@ -17,6 +17,9 @@ defmodule BookReportDemo.Application do
       # Phase 2: Pure Elixir agents
       BookReportDemo.Agents.Timekeeper,
       BookReportDemo.Agents.Grader,
+      # Phase 3: LLM agents
+      BookReportDemo.Agents.DepthExpert,
+      BookReportDemo.Agents.Interviewer,
       # Start to serve requests, typically the last entry
       BookReportDemoWeb.Endpoint
     ]
