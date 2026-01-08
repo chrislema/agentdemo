@@ -1,0 +1,23 @@
+# Ignore Git
+.git
+.gitignore
+
+# Ignore build artifacts
+_build/
+deps/
+
+# Ignore assets node_modules
+assets/node_modules/
+
+# Ignore editor configs
+.vscode/
+.idea/
+
+# Ignore local .env files
+.env*
+
+# Ignore docs
+docs/
+
+# Ignore test
+test/
