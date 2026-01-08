@@ -85,6 +85,8 @@ defmodule BookReportDemo.Agents.Timekeeper do
     remaining = max(state.total_seconds - elapsed, 0)
     topics_left = state.topics_total - state.topics_completed
 
+    Logger.info("[Timekeeper] DEBUG: total=#{state.total_seconds}, elapsed=#{elapsed}, remaining=#{remaining}")
+
     # Seconds per remaining topic at current pace
     pace = if topics_left > 0, do: remaining / topics_left, else: 0
 
@@ -110,16 +112,16 @@ defmodule BookReportDemo.Agents.Timekeeper do
       # Very low time - critical regardless of pace
       remaining <= 30 -> :critical
 
-      # Low time - high pressure
-      remaining <= 60 -> :high
+      # Low time - high pressure (increased from 60 to 90)
+      remaining <= 90 -> :high
 
-      # Behind schedule: less than 45 sec per remaining topic
-      pace < 45 -> :high
+      # Behind schedule: less than 55 sec per remaining topic (target is 60)
+      pace < 55 -> :high
 
-      # On pace or slightly behind: around target of 60 sec/topic
-      pace <= 70 -> :medium
+      # Slightly behind: less than 65 sec per topic
+      pace < 65 -> :medium
 
-      # Ahead of schedule
+      # On pace or ahead
       true -> :low
     end
   end

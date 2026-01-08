@@ -379,13 +379,13 @@ defmodule BookReportDemoWeb.InterviewLive do
                 </div>
 
                 <%= if @show_observations do %>
-                  <div class="space-y-2 max-h-[500px] overflow-y-auto">
+                  <div class="space-y-2 max-h-[500px] overflow-y-auto" id="observations-container" phx-hook="ScrollBottom">
                     <%= if Enum.empty?(@agent_observations) do %>
                       <p class="text-sm opacity-50 text-center py-4">
                         Waiting for interview to start...
                       </p>
                     <% else %>
-                      <%= for obs <- @agent_observations do %>
+                      <%= for obs <- Enum.reverse(@agent_observations) do %>
                         <div class="bg-base-200 rounded-lg p-3 text-sm">
                           <div class="flex items-center gap-2 mb-1">
                             <span class={[

@@ -1,13 +1,11 @@
 defmodule BookReportDemo.Coordinator do
   @moduledoc """
-  Receives signals from all agents and resolves conflicts to produce the next action.
+  LLM-powered coordinator that synthesizes observations from all agents and reasons
+  about the best course of action.
 
-  The Coordinator collects observations within a time window after a student response,
-  then makes a decision based on the combined input from all agents.
-
-  This is where the "parallel vs pipeline" difference becomes visible:
-  - In parallel: Timekeeper and Depth Expert observations arrive nearly simultaneously
-  - In pipeline: They would arrive sequentially, potentially causing suboptimal decisions
+  This is where agent collaboration happens - the Coordinator receives perspectives
+  from Timekeeper, Depth Expert, and Grader, then uses an LLM to reason about
+  trade-offs and make nuanced decisions that feel like human collaboration.
 
   Subscribes to:
   - interview:agent_observation (all agents)
@@ -21,6 +19,10 @@ defmodule BookReportDemo.Coordinator do
 
   alias BookReportDemo.Content.WrinkleInTime
   alias BookReportDemo.InterviewState
+  alias Jido.AI.Prompt
+  alias Jido.AI.Actions.Langchain
+
+  @model_name "claude-3-5-haiku-20241022"
 
   # Time window to collect observations after student response
   @collection_window_ms 800
@@ -116,12 +118,12 @@ defmodule BookReportDemo.Coordinator do
       has_depth_expert = Map.has_key?(state.observations, :depth_expert)
 
       if has_depth_expert or state.wait_retries >= @max_wait_retries do
-        # We have depth_expert OR we've waited long enough - make decision
         if not has_depth_expert do
           Logger.warning("[Coordinator] No depth_expert observation after #{@max_wait_retries} retries, proceeding with defaults")
         end
 
-        decision = decide(state.observations, state)
+        # Use LLM to reason about the decision
+        decision = decide_with_llm(state.observations, state)
         publish_directive(decision, state)
 
         {:noreply, %{state |
@@ -131,7 +133,6 @@ defmodule BookReportDemo.Coordinator do
           wait_retries: 0
         }}
       else
-        # No depth_expert yet - wait a bit more
         Logger.info("[Coordinator] Waiting for depth_expert observation (retry #{state.wait_retries + 1}/#{@max_wait_retries})")
         timer_ref = Process.send_after(self(), :make_decision, @collection_window_ms)
         {:noreply, %{state |
@@ -156,57 +157,184 @@ defmodule BookReportDemo.Coordinator do
     {:noreply, state}
   end
 
-  # Private Functions
+  # Private Functions - LLM-powered decision making
 
-  defp decide(observations, state) do
-    time_obs = Map.get(observations, :timekeeper, %{pressure: :medium})
-    depth_obs = Map.get(observations, :depth_expert)
-    grade_obs = Map.get(observations, :grader, %{coverage_gaps: []})
+  defp decide_with_llm(observations, state) do
+    api_key = System.get_env("ANTHROPIC_API_KEY")
 
-    pressure = Map.get(time_obs, :pressure, :medium)
+    if is_nil(api_key) or api_key == "" do
+      Logger.warning("[Coordinator] No API key, using fallback logic")
+      decide_fallback(observations, state)
+    else
+      prompt = build_decision_prompt(observations, state)
+
+      case Langchain.run(%{
+        model: {:anthropic, [model: @model_name, api_key: api_key]},
+        prompt: prompt,
+        temperature: 0.3,
+        max_tokens: 300
+      }, %{}) do
+        {:ok, %{content: response}} ->
+          parse_decision(response, state)
+
+        {:error, reason} ->
+          Logger.error("[Coordinator] LLM call failed: #{inspect(reason)}, using fallback")
+          decide_fallback(observations, state)
+      end
+    end
+  end
+
+  defp build_decision_prompt(observations, state) do
+    time_obs = Map.get(observations, :timekeeper, %{})
+    depth_obs = Map.get(observations, :depth_expert, %{})
+    grade_obs = Map.get(observations, :grader, %{})
+
+    # Extract key information
+    remaining_seconds = Map.get(time_obs, :remaining_seconds, 300)
+    remaining_time = format_time(remaining_seconds)
+    pressure = Map.get(time_obs, :pressure, :unknown)
+    pace = Map.get(time_obs, :seconds_per_topic, 60)
+    topics_remaining = Map.get(time_obs, :topics_remaining, 5)
+
+    depth_rating = Map.get(depth_obs, :rating, "unknown")
+    depth_rec = Map.get(depth_obs, :recommendation, :unknown)
+
+    running_grade = Map.get(grade_obs, :running_grade, "N/A")
+    topics_scored = Map.get(grade_obs, :topics_scored, 0)
     coverage_gaps = Map.get(grade_obs, :coverage_gaps, [])
 
-    # If we don't have depth_expert observation, default to probing (safer than transitioning)
-    recommendation = if depth_obs do
-      Map.get(depth_obs, :recommendation, :accept)
-    else
-      :probe  # Stay on topic if we don't have depth info
+    current_topic_name = WrinkleInTime.get_topic(state.current_topic)[:name] || state.current_topic
+    next_topic = WrinkleInTime.next_topic(state.current_topic)
+    next_topic_name = if next_topic, do: WrinkleInTime.get_topic(next_topic)[:name] || next_topic, else: "none"
+
+    system_content = """
+    You are the Coordinator in a multi-agent interview system. Your job is to synthesize
+    observations from your fellow agents and decide the best course of action.
+
+    You are collaborating with:
+    - Timekeeper: Tracks time pressure and pace
+    - Depth Expert: Evaluates answer quality and depth
+    - Grader: Tracks coverage and running grade
+
+    Your available actions:
+    - PROBE: Ask a follow-up question on the current topic to get more depth
+    - TRANSITION: Move to the next topic
+    - END: End the interview
+
+    Respond in this exact format:
+    DECISION: [PROBE or TRANSITION or END]
+    REASONING: [Your collaborative reasoning in 1-2 sentences, referencing what each agent observed]
+    """
+
+    user_content = """
+    CURRENT SITUATION:
+    - Current topic: #{current_topic_name}
+    - Next topic: #{next_topic_name}
+    - Student's answer: "#{state.pending_response}"
+
+    AGENT OBSERVATIONS:
+
+    TIMEKEEPER says:
+    - Time remaining: #{remaining_time}
+    - Pressure level: #{pressure}
+    - Current pace: #{pace} seconds per topic (target is 60 sec/topic for 5 topics in 5 min)
+    - Topics still to cover: #{topics_remaining}
+
+    DEPTH EXPERT says:
+    - Answer rating: #{depth_rating}/3
+    - Recommendation: #{depth_rec}
+
+    GRADER says:
+    - Running grade: #{running_grade}
+    - Topics scored so far: #{topics_scored}
+    - Topics not yet covered: #{Enum.join(coverage_gaps, ", ")}
+
+    Based on these observations from your fellow agents, what should we do next?
+    Remember: We need to cover 5 topics in 5 minutes while getting quality answers.
+    """
+
+    Prompt.new(%{
+      messages: [
+        %{role: :system, content: system_content},
+        %{role: :user, content: user_content}
+      ]
+    })
+  end
+
+  defp parse_decision(response, state) do
+    response = String.trim(response)
+    Logger.info("[Coordinator] LLM response: #{response}")
+
+    # Extract decision
+    decision = cond do
+      String.contains?(String.upcase(response), "DECISION: PROBE") -> :probe
+      String.contains?(String.upcase(response), "DECISION: TRANSITION") -> :transition
+      String.contains?(String.upcase(response), "DECISION: END") -> :end_interview
+      String.contains?(String.upcase(response), "PROBE") -> :probe
+      String.contains?(String.upcase(response), "TRANSITION") -> :transition
+      String.contains?(String.upcase(response), "END") -> :end_interview
+      true -> :probe  # Safe default
     end
 
-    Logger.info("[Coordinator] Deciding: pressure=#{pressure}, depth_rec=#{recommendation}, gaps=#{length(coverage_gaps)}")
+    # Extract reasoning
+    reasoning = case Regex.run(~r/REASONING:\s*(.+)/is, response) do
+      [_, reason] -> String.trim(reason) |> String.slice(0, 200)
+      _ -> response |> String.slice(0, 200)
+    end
 
-    cond do
-      # Critical time pressure - wrap up
-      pressure == :critical ->
-        if length(coverage_gaps) > 0 do
-          {:final_question, hd(coverage_gaps), "Critical time pressure, asking final question about gap"}
+    # Build the action tuple
+    case decision do
+      :probe ->
+        {:probe, state.current_topic, reasoning}
+
+      :transition ->
+        next = WrinkleInTime.next_topic(state.current_topic)
+        if next do
+          {:transition, next, reasoning}
         else
-          {:end_interview, nil, "Time complete, all topics covered"}
+          {:end_interview, nil, "All topics covered. " <> reasoning}
         end
 
-      # High pressure + shallow answer - don't probe, move on
-      pressure == :high and recommendation == :probe ->
+      :end_interview ->
+        {:end_interview, nil, reasoning}
+    end
+  end
+
+  # Fallback logic when LLM is unavailable
+  defp decide_fallback(observations, state) do
+    time_obs = Map.get(observations, :timekeeper, %{pressure: :medium})
+    depth_obs = Map.get(observations, :depth_expert)
+
+    pressure = Map.get(time_obs, :pressure, :medium)
+    recommendation = if depth_obs, do: Map.get(depth_obs, :recommendation, :accept), else: :probe
+
+    cond do
+      pressure == :critical ->
+        {:end_interview, nil, "Critical time pressure - ending interview"}
+
+      pressure == :high ->
         next = WrinkleInTime.next_topic(state.current_topic)
-        {:transition, next, "Time pressure high, skipping probe despite shallow answer"}
+        {:transition, next, "Time pressure high - moving to next topic"}
 
-      # Depth says probe and we have time
-      recommendation == :probe and pressure in [:low, :medium] ->
-        {:probe, state.current_topic, "Shallow answer detected, probing deeper"}
-
-      # Depth says accept or move_on
       recommendation in [:accept, :move_on] ->
         next = WrinkleInTime.next_topic(state.current_topic)
         if next do
-          {:transition, next, "Answer accepted, moving to next topic"}
+          {:transition, next, "Answer accepted - moving on"}
         else
           {:end_interview, nil, "All topics completed"}
         end
 
-      # Default - stay on current topic with a probe (safer than transitioning)
       true ->
-        {:probe, state.current_topic, "Default: probing current topic"}
+        {:probe, state.current_topic, "Probing for more depth"}
     end
   end
+
+  defp format_time(seconds) when is_number(seconds) do
+    minutes = div(trunc(seconds), 60)
+    secs = rem(trunc(seconds), 60)
+    "#{minutes}:#{String.pad_leading(Integer.to_string(secs), 2, "0")}"
+  end
+  defp format_time(_), do: "unknown"
 
   defp publish_directive({directive, topic_or_next, reason}, state) do
     timestamp = DateTime.utc_now()
