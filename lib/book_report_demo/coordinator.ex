@@ -23,14 +23,17 @@ defmodule BookReportDemo.Coordinator do
   alias BookReportDemo.InterviewState
 
   # Time window to collect observations after student response
-  @collection_window_ms 500
+  @collection_window_ms 800
+  # Maximum retries waiting for depth_expert observation
+  @max_wait_retries 3
 
   defstruct [
     :current_topic,
     :pending_response,
     :collection_timer,
     observations: %{},
-    awaiting_decision: false
+    awaiting_decision: false,
+    wait_retries: 0
   ]
 
   # Client API
@@ -63,7 +66,11 @@ defmodule BookReportDemo.Coordinator do
   @impl true
   def handle_info({:interview_started, interview_state}, state) do
     Logger.info("[Coordinator] Interview started")
-    {:noreply, %{state | current_topic: interview_state.current_topic, observations: %{}}}
+    {:noreply, %{state |
+      current_topic: interview_state.current_topic,
+      observations: %{},
+      wait_retries: 0
+    }}
   end
 
   @impl true
@@ -83,14 +90,15 @@ defmodule BookReportDemo.Coordinator do
       pending_response: response,
       collection_timer: timer_ref,
       observations: %{},
-      awaiting_decision: true
+      awaiting_decision: true,
+      wait_retries: 0
     }}
   end
 
   @impl true
   def handle_info({:agent_observation, %{agent: agent, observation: obs, timestamp: ts}}, state) do
     if state.awaiting_decision do
-      Logger.debug("[Coordinator] Collected #{agent} observation at #{inspect(ts)}")
+      Logger.info("[Coordinator] Collected #{agent} observation at #{inspect(ts)}")
       observations = Map.put(state.observations, agent, obs)
       {:noreply, %{state | observations: observations}}
     else
@@ -101,17 +109,36 @@ defmodule BookReportDemo.Coordinator do
   @impl true
   def handle_info(:make_decision, state) do
     if state.awaiting_decision do
-      Logger.info("[Coordinator] Collection window closed, making decision")
+      Logger.info("[Coordinator] Collection window closed")
       Logger.info("[Coordinator] Observations collected: #{inspect(Map.keys(state.observations))}")
 
-      decision = decide(state.observations, state)
-      publish_directive(decision, state)
+      # Check if we have the required depth_expert observation
+      has_depth_expert = Map.has_key?(state.observations, :depth_expert)
 
-      {:noreply, %{state |
-        awaiting_decision: false,
-        collection_timer: nil,
-        observations: %{}
-      }}
+      if has_depth_expert or state.wait_retries >= @max_wait_retries do
+        # We have depth_expert OR we've waited long enough - make decision
+        if not has_depth_expert do
+          Logger.warning("[Coordinator] No depth_expert observation after #{@max_wait_retries} retries, proceeding with defaults")
+        end
+
+        decision = decide(state.observations, state)
+        publish_directive(decision, state)
+
+        {:noreply, %{state |
+          awaiting_decision: false,
+          collection_timer: nil,
+          observations: %{},
+          wait_retries: 0
+        }}
+      else
+        # No depth_expert yet - wait a bit more
+        Logger.info("[Coordinator] Waiting for depth_expert observation (retry #{state.wait_retries + 1}/#{@max_wait_retries})")
+        timer_ref = Process.send_after(self(), :make_decision, @collection_window_ms)
+        {:noreply, %{state |
+          collection_timer: timer_ref,
+          wait_retries: state.wait_retries + 1
+        }}
+      end
     else
       {:noreply, state}
     end
@@ -132,13 +159,19 @@ defmodule BookReportDemo.Coordinator do
   # Private Functions
 
   defp decide(observations, state) do
-    time_obs = Map.get(observations, :timekeeper, %{pressure: :low})
-    depth_obs = Map.get(observations, :depth_expert, %{recommendation: :accept})
+    time_obs = Map.get(observations, :timekeeper, %{pressure: :medium})
+    depth_obs = Map.get(observations, :depth_expert)
     grade_obs = Map.get(observations, :grader, %{coverage_gaps: []})
 
-    pressure = Map.get(time_obs, :pressure, :low)
-    recommendation = Map.get(depth_obs, :recommendation, :accept)
+    pressure = Map.get(time_obs, :pressure, :medium)
     coverage_gaps = Map.get(grade_obs, :coverage_gaps, [])
+
+    # If we don't have depth_expert observation, default to probing (safer than transitioning)
+    recommendation = if depth_obs do
+      Map.get(depth_obs, :recommendation, :accept)
+    else
+      :probe  # Stay on topic if we don't have depth info
+    end
 
     Logger.info("[Coordinator] Deciding: pressure=#{pressure}, depth_rec=#{recommendation}, gaps=#{length(coverage_gaps)}")
 
@@ -169,10 +202,9 @@ defmodule BookReportDemo.Coordinator do
           {:end_interview, nil, "All topics completed"}
         end
 
-      # Default - move on
+      # Default - stay on current topic with a probe (safer than transitioning)
       true ->
-        next = WrinkleInTime.next_topic(state.current_topic)
-        {:transition, next, "Default: moving to next topic"}
+        {:probe, state.current_topic, "Default: probing current topic"}
     end
   end
 
@@ -194,6 +226,15 @@ defmodule BookReportDemo.Coordinator do
       {:coordinator_directive, message}
     )
 
+    # Also publish to agent_observation so UI can see coordinator decisions
+    publish_observation(%{
+      directive: directive,
+      topic: state.current_topic,
+      next_topic: topic_or_next,
+      reason: reason,
+      observations_received: Map.keys(state.observations)
+    }, timestamp)
+
     Logger.info("[Coordinator] Published: #{directive} - #{reason}")
 
     # If transitioning, also mark current topic as completed
@@ -201,5 +242,19 @@ defmodule BookReportDemo.Coordinator do
       InterviewState.complete_topic(state.current_topic)
       InterviewState.advance_topic()
     end
+  end
+
+  defp publish_observation(observation, timestamp) do
+    message = %{
+      agent: :coordinator,
+      timestamp: timestamp,
+      observation: observation
+    }
+
+    Phoenix.PubSub.broadcast(
+      BookReportDemo.PubSub,
+      "interview:agent_observation",
+      {:agent_observation, message}
+    )
   end
 end

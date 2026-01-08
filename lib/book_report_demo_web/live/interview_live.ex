@@ -138,10 +138,8 @@ defmodule BookReportDemoWeb.InterviewLive do
       timestamp: ts
     }
 
-    # Keep last 10 observations
-    observations =
-      [observation | socket.assigns.agent_observations]
-      |> Enum.take(10)
+    # Keep all observations (newest first)
+    observations = [observation | socket.assigns.agent_observations]
 
     # Update UI based on agent type
     socket =
@@ -186,8 +184,24 @@ defmodule BookReportDemoWeb.InterviewLive do
   end
 
   @impl true
+  def handle_info({:tick, %{timestamp: timestamp}}, socket) do
+    # Update timer directly from tick events
+    if socket.assigns.interview_status == :in_progress do
+      # Calculate remaining time based on interview start
+      state = BookReportDemo.InterviewState.get_state()
+      remaining = if state.started_at do
+        max(300 - DateTime.diff(timestamp, state.started_at, :second), 0)
+      else
+        socket.assigns.time_remaining
+      end
+      {:noreply, assign(socket, time_remaining: remaining)}
+    else
+      {:noreply, socket}
+    end
+  end
+
   def handle_info({:tick, _}, socket) do
-    # Tick updates come through agent_observation from Timekeeper
+    # Fallback for tick without timestamp
     {:noreply, socket}
   end
 
@@ -226,6 +240,13 @@ defmodule BookReportDemoWeb.InterviewLive do
     rating = Map.get(obs, :rating, "?")
     rec = Map.get(obs, :recommendation, :unknown)
     "Rating: #{rating}/3, recommends: #{rec}"
+  end
+
+  defp observation_summary(:coordinator, obs) do
+    directive = Map.get(obs, :directive, :unknown)
+    reason = Map.get(obs, :reason, "")
+    agents = Map.get(obs, :observations_received, []) |> Enum.join(", ")
+    "Decision: #{directive} (#{reason}) [from: #{agents}]"
   end
 
   defp observation_summary(_agent, obs) do
@@ -277,9 +298,9 @@ defmodule BookReportDemoWeb.InterviewLive do
           <!-- Chat area -->
           <div class="lg:col-span-2">
             <div class="card bg-base-100 shadow-xl h-[600px] flex flex-col">
-              <div class="card-body flex flex-col p-4">
+              <div class="card-body flex flex-col p-4 min-h-0">
                 <!-- Messages -->
-                <div class="flex-1 overflow-y-auto space-y-4 mb-4" id="messages-container" phx-hook="ScrollBottom">
+                <div class="flex-1 overflow-y-auto space-y-4 mb-4 min-h-0" id="messages-container" phx-hook="ScrollBottom">
                   <%= if @interview_status == :not_started do %>
                     <div class="hero min-h-[400px]">
                       <div class="hero-content text-center">
@@ -373,6 +394,7 @@ defmodule BookReportDemoWeb.InterviewLive do
                                 :timekeeper -> "badge-info"
                                 :grader -> "badge-success"
                                 :depth_expert -> "badge-warning"
+                                :coordinator -> "badge-error"
                                 _ -> "badge-ghost"
                               end
                             ]}>

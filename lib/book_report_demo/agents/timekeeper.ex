@@ -88,7 +88,7 @@ defmodule BookReportDemo.Agents.Timekeeper do
     # Seconds per remaining topic at current pace
     pace = if topics_left > 0, do: remaining / topics_left, else: 0
 
-    pressure = calculate_pressure(remaining, pace)
+    pressure = calculate_pressure(remaining, topics_left, pace)
     recommendation = calculate_recommendation(pressure)
 
     %{
@@ -102,12 +102,24 @@ defmodule BookReportDemo.Agents.Timekeeper do
     }
   end
 
-  defp calculate_pressure(remaining, pace) do
+  defp calculate_pressure(remaining, topics_left, pace) do
     cond do
+      # All topics done - no pressure
+      topics_left == 0 -> :low
+
+      # Very low time - critical regardless of pace
       remaining <= 30 -> :critical
+
+      # Low time - high pressure
       remaining <= 60 -> :high
-      pace < 45 -> :high          # Less than 45 sec per topic
-      pace < 60 -> :medium
+
+      # Behind schedule: less than 45 sec per remaining topic
+      pace < 45 -> :high
+
+      # On pace or slightly behind: around target of 60 sec/topic
+      pace <= 70 -> :medium
+
+      # Ahead of schedule
       true -> :low
     end
   end
