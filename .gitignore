@@ -39,3 +39,5 @@ npm-debug.log
 
 # Claude Code config (synced from lema-claude-code-config repo)
 .claude/
+CLAUDE.md
+settings.local.sample.json
