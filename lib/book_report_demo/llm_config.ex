@@ -11,12 +11,20 @@ defmodule BookReportDemo.LLMConfig do
 
   Or use defaults (Anthropic Claude):
     ANTHROPIC_API_KEY=sk-ant-...
+
+  Runtime switching supported via set_active_model/2.
   """
 
   require Logger
 
   @default_provider :anthropic
   @default_model "claude-3-5-haiku-20241022"
+
+  # Available models with friendly labels
+  @models [
+    %{label: "Claude Haiku", provider: :anthropic, model: "claude-3-5-haiku-20241022"},
+    %{label: "Llama 4 Scout (Groq)", provider: :groq, model: "llama-4-scout-17b-16e-instruct"}
+  ]
 
   # Provider -> API key env var mapping
   @api_key_env_vars %{
@@ -30,6 +38,75 @@ defmodule BookReportDemo.LLMConfig do
     groq: "https://api.groq.com/openai/v1/chat/completions"
   }
 
+  # ETS table for runtime state
+  @ets_table :llm_config_state
+
+  @doc """
+  Initialize ETS table for runtime state. Call from application.ex at startup.
+  """
+  def init_runtime_state do
+    # Create ETS table if it doesn't exist
+    if :ets.whereis(@ets_table) == :undefined do
+      :ets.new(@ets_table, [:set, :public, :named_table])
+    end
+
+    # Set defaults from environment config
+    :ets.insert(@ets_table, {:active_provider, config_provider()})
+    :ets.insert(@ets_table, {:active_model, config_model()})
+    :ok
+  end
+
+  @doc """
+  Get models where API key is configured.
+  Returns list of %{label: "...", provider: :atom, model: "..."}.
+  """
+  def available_models do
+    @models
+    |> Enum.filter(fn %{provider: provider} -> has_api_key_for?(provider) end)
+  end
+
+  @doc """
+  Set active model at runtime. Takes effect immediately for subsequent LLM calls.
+  """
+  def set_active_model(provider, model) when is_atom(provider) and is_binary(model) do
+    :ets.insert(@ets_table, {:active_provider, provider})
+    :ets.insert(@ets_table, {:active_model, model})
+    log_config()
+    :ok
+  end
+
+  @doc """
+  Get the active provider (from ETS runtime state).
+  """
+  def active_provider do
+    case :ets.whereis(@ets_table) do
+      :undefined ->
+        config_provider()
+
+      _table ->
+        case :ets.lookup(@ets_table, :active_provider) do
+          [{:active_provider, provider}] -> provider
+          [] -> config_provider()
+        end
+    end
+  end
+
+  @doc """
+  Get the active model name (from ETS runtime state).
+  """
+  def active_model do
+    case :ets.whereis(@ets_table) do
+      :undefined ->
+        config_model()
+
+      _table ->
+        case :ets.lookup(@ets_table, :active_model) do
+          [{:active_model, model}] -> model
+          [] -> config_model()
+        end
+    end
+  end
+
   @doc """
   Get the model specification for LLM calls.
 
@@ -38,8 +115,8 @@ defmodule BookReportDemo.LLMConfig do
   - {:openai, [model: "...", api_key: "...", endpoint: "..."]} for Groq (OpenAI-compatible)
   """
   def get_model_spec do
-    provider = current_provider()
-    model = current_model()
+    provider = active_provider()
+    model = active_model()
     api_key = get_api_key(provider)
 
     if is_nil(api_key) or api_key == "" do
@@ -83,37 +160,49 @@ defmodule BookReportDemo.LLMConfig do
   end
 
   @doc """
-  Get the current LLM provider.
+  Get the LLM provider from application config (environment variables).
+  Used as default when ETS not initialized.
   """
-  def current_provider do
+  def config_provider do
     config = Application.get_env(:book_report_demo, :llm, [])
     Keyword.get(config, :provider, @default_provider)
   end
 
   @doc """
-  Get the current model name.
+  Get the model name from application config (environment variables).
+  Used as default when ETS not initialized.
   """
-  def current_model do
+  def config_model do
     config = Application.get_env(:book_report_demo, :llm, [])
     Keyword.get(config, :model, @default_model)
   end
 
+  # Keep old names as aliases for backwards compatibility
+  defdelegate current_provider, to: __MODULE__, as: :active_provider
+  defdelegate current_model, to: __MODULE__, as: :active_model
+
   @doc """
-  Check if we have a valid API key configured.
+  Check if we have a valid API key configured for the active provider.
   """
   def has_api_key? do
-    provider = current_provider()
+    has_api_key_for?(active_provider())
+  end
+
+  @doc """
+  Check if a specific provider has an API key configured.
+  """
+  def has_api_key_for?(provider) do
     api_key = get_api_key(provider)
     not is_nil(api_key) and api_key != ""
   end
 
   @doc """
-  Log the current LLM configuration (useful at startup).
+  Log the current LLM configuration (useful at startup and after changes).
   """
   def log_config do
-    provider = current_provider()
-    model = current_model()
-    has_key = has_api_key?()
+    provider = active_provider()
+    model = active_model()
+    has_key = has_api_key_for?(provider)
 
     Logger.info("[LLMConfig] Provider: #{provider}, Model: #{model}, API Key: #{if has_key, do: "configured", else: "MISSING"}")
   end

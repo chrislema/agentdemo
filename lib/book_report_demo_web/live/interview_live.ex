@@ -4,6 +4,7 @@ defmodule BookReportDemoWeb.InterviewLive do
   alias BookReportDemo.InterviewState
   alias BookReportDemo.Ticker
   alias BookReportDemo.Content.WrinkleInTime
+  alias BookReportDemo.LLMConfig
 
   @impl true
   def mount(_params, _session, socket) do
@@ -27,7 +28,9 @@ defmodule BookReportDemoWeb.InterviewLive do
        topics_completed: 0,
        running_grade: "N/A",
        agent_observations: [],
-       show_observations: true
+       show_observations: true,
+       available_models: LLMConfig.available_models(),
+       active_model_key: "#{LLMConfig.active_provider()}:#{LLMConfig.active_model()}"
      )}
   end
 
@@ -111,6 +114,14 @@ defmodule BookReportDemoWeb.InterviewLive do
        running_grade: "N/A",
        agent_observations: []
      )}
+  end
+
+  @impl true
+  def handle_event("select_model", %{"model" => model_key}, socket) do
+    [provider_str, model] = String.split(model_key, ":", parts: 2)
+    provider = String.to_existing_atom(provider_str)
+    LLMConfig.set_active_model(provider, model)
+    {:noreply, assign(socket, active_model_key: model_key)}
   end
 
   # PubSub handlers
@@ -418,6 +429,29 @@ defmodule BookReportDemoWeb.InterviewLive do
                   <div class="divider text-xs">Current Topic</div>
                   <div class="badge badge-outline badge-lg w-full">
                     {WrinkleInTime.get_topic(@current_topic)[:name] || @current_topic}
+                  </div>
+                <% end %>
+
+                <!-- Model Selector - only show if multiple models available -->
+                <%= if length(@available_models) > 1 do %>
+                  <div class="mt-4 pt-4 border-t border-base-300">
+                    <label class="label">
+                      <span class="label-text text-xs opacity-70">LLM Model</span>
+                    </label>
+                    <select
+                      class="select select-bordered select-sm w-full"
+                      phx-change="select_model"
+                      name="model"
+                    >
+                      <%= for model <- @available_models do %>
+                        <option
+                          value={"#{model.provider}:#{model.model}"}
+                          selected={@active_model_key == "#{model.provider}:#{model.model}"}
+                        >
+                          {model.label}
+                        </option>
+                      <% end %>
+                    </select>
                   </div>
                 <% end %>
               </div>

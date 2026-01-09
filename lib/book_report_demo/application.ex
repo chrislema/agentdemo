@@ -30,7 +30,8 @@ defmodule BookReportDemo.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: BookReportDemo.Supervisor]
 
-    # Log LLM configuration at startup
+    # Initialize LLM runtime state and log configuration
+    BookReportDemo.LLMConfig.init_runtime_state()
     BookReportDemo.LLMConfig.log_config()
 
     Supervisor.start_link(children, opts)
