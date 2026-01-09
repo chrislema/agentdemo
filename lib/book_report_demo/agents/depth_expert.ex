@@ -19,6 +19,7 @@ defmodule BookReportDemo.Agents.DepthExpert do
 
   defstruct [
     :current_topic,
+    :last_question_asked,  # Track the actual question so we evaluate against it
     topic_criteria: %{}
   ]
 
@@ -39,6 +40,8 @@ defmodule BookReportDemo.Agents.DepthExpert do
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:student_response")
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:events")
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:topic_completed")
+    # Subscribe to questions so we can evaluate against the actual question asked
+    Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:question_asked")
 
     # Build criteria map from topics
     criteria =
@@ -46,7 +49,7 @@ defmodule BookReportDemo.Agents.DepthExpert do
       |> Enum.map(fn t -> {t.id, t.depth_criteria} end)
       |> Map.new()
 
-    {:ok, %__MODULE__{topic_criteria: criteria, current_topic: :theme}}
+    {:ok, %__MODULE__{topic_criteria: criteria, current_topic: :theme, last_question_asked: nil}}
   end
 
   @impl true
@@ -57,7 +60,14 @@ defmodule BookReportDemo.Agents.DepthExpert do
   @impl true
   def handle_info({:interview_started, interview_state}, state) do
     Logger.info("[DepthExpert] Interview started")
-    {:noreply, %{state | current_topic: interview_state.current_topic}}
+    {:noreply, %{state | current_topic: interview_state.current_topic, last_question_asked: nil}}
+  end
+
+  @impl true
+  def handle_info({:question_asked, %{question: question, topic: topic}}, state) do
+    # Track the actual question asked so we can evaluate responses against it
+    Logger.debug("[DepthExpert] Heard question: #{String.slice(question, 0, 50)}...")
+    {:noreply, %{state | last_question_asked: question, current_topic: topic}}
   end
 
   @impl true
@@ -65,13 +75,15 @@ defmodule BookReportDemo.Agents.DepthExpert do
     timestamp = DateTime.utc_now()
     Logger.info("[DepthExpert] Evaluating response for topic #{topic}")
 
-    # Get the topic info
+    # Get the topic info and the actual question that was asked
     topic_info = WrinkleInTime.get_topic(topic)
     criteria = Map.get(state.topic_criteria, topic, "")
+    # Use the actual question asked, fall back to starter if not available
+    actual_question = state.last_question_asked || topic_info.starter
 
     # Evaluate asynchronously to not block
     Task.start(fn ->
-      case evaluate_response(topic_info, criteria, response) do
+      case evaluate_response(topic_info, criteria, response, actual_question) do
         {:ok, evaluation} ->
           publish_observation(topic, evaluation, timestamp)
 
@@ -98,14 +110,14 @@ defmodule BookReportDemo.Agents.DepthExpert do
 
   # Private Functions
 
-  defp evaluate_response(topic_info, criteria, response) do
+  defp evaluate_response(topic_info, criteria, response, actual_question) do
     api_key = System.get_env("ANTHROPIC_API_KEY")
 
     if is_nil(api_key) or api_key == "" do
       Logger.error("[DepthExpert] ANTHROPIC_API_KEY not set")
       {:error, "API key not configured"}
     else
-      prompt = build_prompt(topic_info, criteria, response)
+      prompt = build_prompt(topic_info, criteria, response, actual_question)
 
       case Langchain.run(%{
         model: {:anthropic, [model: @model_name, api_key: api_key]},
@@ -122,32 +134,38 @@ defmodule BookReportDemo.Agents.DepthExpert do
     end
   end
 
-  defp build_prompt(topic_info, criteria, response) do
+  defp build_prompt(topic_info, criteria, response, actual_question) do
     system_content = """
     You are evaluating a student's understanding of "A Wrinkle in Time" for a book report.
     You must respond with ONLY valid JSON, no other text.
+
+    IMPORTANT: Evaluate the response based on how well it answers the ACTUAL QUESTION ASKED,
+    not some abstract criteria. If the question asked for a specific moment and the student
+    gave one, that's a good answer even if it doesn't hit every possible depth criteria.
     """
 
     user_content = """
     Current topic: #{topic_info.name}
-    Criteria for depth: #{criteria}
+    General criteria for this topic: #{criteria}
 
-    Question asked: #{topic_info.starter}
-    Student's response: #{response}
+    ACTUAL QUESTION ASKED: "#{actual_question}"
+    Student's response: "#{response}"
 
-    Evaluate the response:
+    Evaluate how well the response answers the actual question:
     1. Rating (1-3):
-       - 1 = Shallow: Generic, no textual support, could apply to any book
-       - 2 = Adequate: Shows they read it, basic understanding
-       - 3 = Deep: Specific details, insightful connections, real engagement
+       - 1 = Shallow: Doesn't answer the question, generic, or shows no understanding
+       - 2 = Adequate: Answers the question with some specificity, shows they read it
+       - 3 = Deep: Directly answers with specific details, insightful connections
 
     2. Recommendation:
-       - "probe" = Answer was shallow, worth asking a follow-up
-       - "accept" = Good enough, move to next topic
-       - "move_on" = Either excellent OR hopeless, don't linger
+       - "probe" = Answer was shallow or off-topic, worth asking a follow-up
+       - "accept" = Good enough answer to the question, can move on
+       - "move_on" = Either excellent OR student seems stuck, don't linger
+
+    Also note if the student seems frustrated (short dismissive answers, "I already said that", etc.)
 
     Respond with ONLY valid JSON:
-    {"rating": N, "recommendation": "X", "note": "brief explanation"}
+    {"rating": N, "recommendation": "X", "note": "brief explanation", "frustration_detected": true/false}
     """
 
     Prompt.new(%{
@@ -168,7 +186,12 @@ defmodule BookReportDemo.Agents.DepthExpert do
       |> String.trim()
 
     case Jason.decode(cleaned) do
-      {:ok, %{"rating" => rating, "recommendation" => rec, "note" => note}} ->
+      {:ok, parsed} ->
+        rating = Map.get(parsed, "rating", 2)
+        rec = Map.get(parsed, "recommendation", "accept")
+        note = Map.get(parsed, "note", "")
+        frustration = Map.get(parsed, "frustration_detected", false)
+
         recommendation = case rec do
           "probe" -> :probe
           "accept" -> :accept
@@ -176,16 +199,25 @@ defmodule BookReportDemo.Agents.DepthExpert do
           _ -> :accept
         end
 
+        # If frustration detected, recommend moving on regardless
+        final_recommendation = if frustration and recommendation == :probe do
+          Logger.info("[DepthExpert] Frustration detected, recommending move_on instead of probe")
+          :move_on
+        else
+          recommendation
+        end
+
         {:ok, %{
           rating: rating,
-          recommendation: recommendation,
-          note: note
+          recommendation: final_recommendation,
+          note: note,
+          frustration_detected: frustration
         }}
 
       {:error, _} ->
         Logger.warning("[DepthExpert] Failed to parse JSON: #{cleaned}")
         # Return a default on parse failure
-        {:ok, %{rating: 2, recommendation: :accept, note: "Parse error, defaulting to accept"}}
+        {:ok, %{rating: 2, recommendation: :accept, note: "Parse error, defaulting to accept", frustration_detected: false}}
     end
   end
 
@@ -197,7 +229,8 @@ defmodule BookReportDemo.Agents.DepthExpert do
         topic: topic,
         rating: evaluation.rating,
         recommendation: evaluation.recommendation,
-        note: evaluation.note
+        note: evaluation.note,
+        frustration_detected: Map.get(evaluation, :frustration_detected, false)
       }
     }
 
@@ -207,6 +240,7 @@ defmodule BookReportDemo.Agents.DepthExpert do
       {:agent_observation, message}
     )
 
-    Logger.info("[DepthExpert] Published: rating=#{evaluation.rating}, rec=#{evaluation.recommendation}")
+    frustration_note = if evaluation[:frustration_detected], do: " [FRUSTRATION DETECTED]", else: ""
+    Logger.info("[DepthExpert] Published: rating=#{evaluation.rating}, rec=#{evaluation.recommendation}#{frustration_note}")
   end
 end

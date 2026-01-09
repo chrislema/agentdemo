@@ -35,7 +35,10 @@ defmodule BookReportDemo.Coordinator do
     :collection_timer,
     observations: %{},
     awaiting_decision: false,
-    wait_retries: 0
+    wait_retries: 0,
+    # Track probe history per topic so LLM can reason about patterns
+    # Format: %{topic => [%{response_summary: "", rating: 2, recommendation: :probe}, ...]}
+    probe_history: %{}
   ]
 
   # Client API
@@ -71,7 +74,8 @@ defmodule BookReportDemo.Coordinator do
     {:noreply, %{state |
       current_topic: interview_state.current_topic,
       observations: %{},
-      wait_retries: 0
+      wait_retries: 0,
+      probe_history: %{}
     }}
   end
 
@@ -126,11 +130,15 @@ defmodule BookReportDemo.Coordinator do
         decision = decide_with_llm(state.observations, state)
         publish_directive(decision, state)
 
+        # Record this exchange in probe history so LLM has context for future decisions
+        new_probe_history = record_probe_history(state, decision)
+
         {:noreply, %{state |
           awaiting_decision: false,
           collection_timer: nil,
           observations: %{},
-          wait_retries: 0
+          wait_retries: 0,
+          probe_history: new_probe_history
         }}
       else
         Logger.info("[Coordinator] Waiting for depth_expert observation (retry #{state.wait_retries + 1}/#{@max_wait_retries})")
@@ -198,6 +206,8 @@ defmodule BookReportDemo.Coordinator do
 
     depth_rating = Map.get(depth_obs, :rating, "unknown")
     depth_rec = Map.get(depth_obs, :recommendation, :unknown)
+    depth_note = Map.get(depth_obs, :note, "")
+    frustration_detected = Map.get(depth_obs, :frustration_detected, false)
 
     running_grade = Map.get(grade_obs, :running_grade, "N/A")
     topics_scored = Map.get(grade_obs, :topics_scored, 0)
@@ -221,16 +231,30 @@ defmodule BookReportDemo.Coordinator do
     - TRANSITION: Move to the next topic
     - END: End the interview
 
+    IMPORTANT CONSIDERATIONS:
+    - If we've already probed a topic 2-3+ times with mediocre ratings, continuing to probe
+      is unlikely to yield better results. Consider transitioning to cover more ground.
+    - Time pressure is real: if Timekeeper says we're behind, we need to move faster.
+    - A student who gives consistent 2/3 ratings has demonstrated adequate understanding.
+      Pursuing a 3/3 at the cost of topic coverage is usually not worth it.
+    - Watch for signs of student frustration (short answers, repetition, pushback).
+
     Respond in this exact format:
     DECISION: [PROBE or TRANSITION or END]
     REASONING: [Your collaborative reasoning in 1-2 sentences, referencing what each agent observed]
     """
 
+    # Get probe history context
+    probe_history_text = format_probe_history(state.probe_history, state.current_topic)
+
     user_content = """
     CURRENT SITUATION:
     - Current topic: #{current_topic_name}
     - Next topic: #{next_topic_name}
-    - Student's answer: "#{state.pending_response}"
+    - Student's latest answer: "#{state.pending_response}"
+
+    PROBE HISTORY FOR THIS TOPIC:
+    #{probe_history_text}
 
     AGENT OBSERVATIONS:
 
@@ -243,14 +267,17 @@ defmodule BookReportDemo.Coordinator do
     DEPTH EXPERT says:
     - Answer rating: #{depth_rating}/3
     - Recommendation: #{depth_rec}
+    - Note: #{depth_note}
+    - Student frustration detected: #{frustration_detected}
 
     GRADER says:
     - Running grade: #{running_grade}
     - Topics scored so far: #{topics_scored}
     - Topics not yet covered: #{Enum.join(coverage_gaps, ", ")}
 
-    Based on these observations from your fellow agents, what should we do next?
-    Remember: We need to cover 5 topics in 5 minutes while getting quality answers.
+    Based on these observations from your fellow agents and the probe history, what should we do next?
+    Remember: We need to cover 5 topics in 5 minutes while getting quality answers. Covering more topics
+    with adequate depth is better than exhaustively probing one topic.
     """
 
     Prompt.new(%{
@@ -335,6 +362,54 @@ defmodule BookReportDemo.Coordinator do
     "#{minutes}:#{String.pad_leading(Integer.to_string(secs), 2, "0")}"
   end
   defp format_time(_), do: "unknown"
+
+  # Record probe history for the current topic so LLM can reason about patterns
+  defp record_probe_history(state, {decision_type, _topic_or_next, _reason}) do
+    topic = state.current_topic
+    depth_obs = Map.get(state.observations, :depth_expert, %{})
+
+    entry = %{
+      response_summary: String.slice(state.pending_response || "", 0, 100),
+      rating: Map.get(depth_obs, :rating, nil),
+      recommendation: Map.get(depth_obs, :recommendation, nil),
+      decision: decision_type
+    }
+
+    # If transitioning, clear history for old topic (we're moving on)
+    if decision_type == :transition do
+      Map.delete(state.probe_history, topic)
+    else
+      # Add to history for this topic
+      current_history = Map.get(state.probe_history, topic, [])
+      Map.put(state.probe_history, topic, current_history ++ [entry])
+    end
+  end
+
+  # Format probe history for LLM prompt
+  defp format_probe_history(probe_history, topic) do
+    history = Map.get(probe_history, topic, [])
+
+    if Enum.empty?(history) do
+      "This is the first response on this topic."
+    else
+      count = length(history)
+      ratings = history |> Enum.map(& &1.rating) |> Enum.reject(&is_nil/1)
+
+      history_lines = history
+        |> Enum.with_index(1)
+        |> Enum.map(fn {entry, idx} ->
+          "  #{idx}. Rating: #{entry.rating || "N/A"}/3, Decision: #{entry.decision}, Response: \"#{entry.response_summary}...\""
+        end)
+        |> Enum.join("\n")
+
+      """
+      We have probed this topic #{count} time(s) already.
+      Previous exchanges on this topic:
+      #{history_lines}
+      Average rating so far: #{if Enum.empty?(ratings), do: "N/A", else: Float.round(Enum.sum(ratings) / length(ratings), 1)}/3
+      """
+    end
+  end
 
   defp publish_directive({directive, topic_or_next, reason}, state) do
     timestamp = DateTime.utc_now()

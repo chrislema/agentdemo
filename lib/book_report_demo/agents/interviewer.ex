@@ -19,7 +19,11 @@ defmodule BookReportDemo.Agents.Interviewer do
 
   defstruct [
     topics: [],
-    conversation_history: []
+    conversation_history: [],
+    # Track probe attempts per topic so we can vary our approach
+    probe_count: %{},
+    # Track last depth expert feedback to inform our questions
+    last_depth_feedback: nil
   ]
 
   # Client API
@@ -43,8 +47,10 @@ defmodule BookReportDemo.Agents.Interviewer do
   def init(_opts) do
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:coordinator_directive")
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:events")
+    # Listen to agent observations to hear depth expert feedback
+    Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:agent_observation")
 
-    {:ok, %__MODULE__{topics: WrinkleInTime.topics()}}
+    {:ok, %__MODULE__{topics: WrinkleInTime.topics(), probe_count: %{}, last_depth_feedback: nil}}
   end
 
   @impl true
@@ -68,18 +74,47 @@ defmodule BookReportDemo.Agents.Interviewer do
 
   @impl true
   def handle_info({:interview_started, _interview_state}, state) do
-    Logger.info("[Interviewer] Interview started, resetting history")
-    {:noreply, %{state | conversation_history: []}}
+    Logger.info("[Interviewer] Interview started, resetting state")
+    {:noreply, %{state | conversation_history: [], probe_count: %{}, last_depth_feedback: nil}}
+  end
+
+  @impl true
+  def handle_info({:agent_observation, %{agent: :depth_expert, observation: obs}}, state) do
+    # Track depth expert feedback so we can inform our questions
+    Logger.debug("[Interviewer] Received depth feedback: rating=#{obs.rating}, rec=#{obs.recommendation}")
+    {:noreply, %{state | last_depth_feedback: obs}}
+  end
+
+  @impl true
+  def handle_info({:agent_observation, _other}, state) do
+    # Ignore observations from other agents
+    {:noreply, state}
   end
 
   @impl true
   def handle_info({:coordinator_directive, directive}, state) do
     Logger.info("[Interviewer] Received directive: #{inspect(directive.directive)}")
 
+    # Track probe count for this topic
+    topic = directive[:topic] || directive[:next_topic]
+    current_count = Map.get(state.probe_count, topic, 0)
+    new_probe_count = if directive.directive == :probe do
+      Map.put(state.probe_count, topic, current_count + 1)
+    else
+      # Reset count when transitioning to new topic
+      if directive.directive == :transition do
+        Map.delete(state.probe_count, directive[:topic])
+      else
+        state.probe_count
+      end
+    end
+
+    probe_attempt = Map.get(new_probe_count, topic, 0)
+    depth_feedback = state.last_depth_feedback
+
     Task.start(fn ->
-      case handle_directive(directive, state) do
+      case handle_directive(directive, state, probe_attempt, depth_feedback) do
         {:ok, question} ->
-          topic = directive[:topic] || directive[:next_topic]
           publish_question(question, topic)
 
         {:error, reason} ->
@@ -89,7 +124,7 @@ defmodule BookReportDemo.Agents.Interviewer do
 
     # Update conversation history with directive info
     new_history = update_history_from_directive(state.conversation_history, directive)
-    {:noreply, %{state | conversation_history: new_history}}
+    {:noreply, %{state | conversation_history: new_history, probe_count: new_probe_count}}
   end
 
   @impl true
@@ -99,10 +134,10 @@ defmodule BookReportDemo.Agents.Interviewer do
 
   # Private Functions
 
-  defp handle_directive(directive, state) do
+  defp handle_directive(directive, state, probe_attempt, depth_feedback) do
     case directive.directive do
       :probe ->
-        generate_probe_question(directive.topic, state.conversation_history)
+        generate_probe_question(directive.topic, state.conversation_history, probe_attempt, depth_feedback)
 
       :transition ->
         generate_transition(directive.topic, directive.next_topic, state.conversation_history)
@@ -118,7 +153,7 @@ defmodule BookReportDemo.Agents.Interviewer do
     end
   end
 
-  defp generate_probe_question(topic, history) do
+  defp generate_probe_question(topic, history, probe_attempt, depth_feedback) do
     api_key = System.get_env("ANTHROPIC_API_KEY")
 
     if is_nil(api_key) or api_key == "" do
@@ -126,7 +161,7 @@ defmodule BookReportDemo.Agents.Interviewer do
       {:ok, "Can you tell me more about that? What specific details from the book support your answer?"}
     else
       topic_info = WrinkleInTime.get_topic(topic)
-      prompt = build_probe_prompt(topic_info, history)
+      prompt = build_probe_prompt(topic_info, history, probe_attempt, depth_feedback)
 
       case Langchain.run(%{
         model: {:anthropic, [model: @model_name, api_key: api_key]},
@@ -180,13 +215,39 @@ defmodule BookReportDemo.Agents.Interviewer do
     end
   end
 
-  defp build_probe_prompt(topic_info, history) do
+  defp build_probe_prompt(topic_info, history, probe_attempt, depth_feedback) do
     history_text = format_history(history)
+
+    # Build context about depth expert feedback
+    depth_context = if depth_feedback do
+      rating = depth_feedback[:rating] || "unknown"
+      note = depth_feedback[:note] || ""
+      frustration = if depth_feedback[:frustration_detected], do: " The student may be getting frustrated.", else: ""
+      "Depth Expert rated the last answer #{rating}/3. Note: #{note}#{frustration}"
+    else
+      "No depth feedback available yet."
+    end
+
+    # Build probe attempt context
+    probe_context = case probe_attempt do
+      1 -> "This is our FIRST follow-up question on this topic."
+      2 -> "This is our SECOND follow-up on this topic. Try a different angle."
+      3 -> "This is our THIRD follow-up. We've asked several questions already - try something fresh or acknowledge what they've shared."
+      n when n > 3 -> "This is follow-up ##{n}. We've probed extensively. Consider acknowledging their input and asking something very specific or different."
+      _ -> ""
+    end
 
     system_content = """
     You are a warm, encouraging interviewer discussing "A Wrinkle in Time" with a student.
     Generate ONE natural follow-up question to probe deeper into their understanding.
     Don't be condescending. Be curious and encouraging.
+
+    IMPORTANT:
+    - If this is a later probe attempt (2nd, 3rd+), vary your approach significantly
+    - Don't ask for the same thing in different words
+    - If they gave a specific example, acknowledge it and build on it
+    - If they seem stuck, try a different angle entirely
+
     Respond with ONLY the question, no preamble, no quotes.
     """
 
@@ -196,8 +257,14 @@ defmodule BookReportDemo.Agents.Interviewer do
 
     Current topic: #{topic_info.name}
 
-    The student's answer was shallow. Ask ONE natural follow-up question to go deeper.
-    Keep it conversational and encouraging.
+    CONTEXT FROM OTHER AGENTS:
+    #{depth_context}
+    #{probe_context}
+
+    Generate ONE natural follow-up question. If this is a later attempt, make sure to:
+    - Not repeat what you've already asked
+    - Acknowledge any specific details the student shared
+    - Try a different angle if previous probes haven't worked
     """
 
     Prompt.new(%{

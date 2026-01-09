@@ -40,6 +40,8 @@ defmodule BookReportDemo.Agents.Timekeeper do
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:tick")
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:topic_completed")
     Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:events")
+    # Also listen to student responses so we can provide fresh time data to coordinator
+    Phoenix.PubSub.subscribe(BookReportDemo.PubSub, "interview:student_response")
 
     {:ok, %__MODULE__{}}
   end
@@ -61,6 +63,19 @@ defmodule BookReportDemo.Agents.Timekeeper do
       observation = calculate_observation(state, timestamp)
       publish_observation(observation, timestamp)
       Logger.debug("[Timekeeper] Tick - pressure: #{observation.pressure}, remaining: #{observation.remaining_seconds}s")
+    end
+
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({:student_response, %{timestamp: timestamp}}, state) do
+    # Publish fresh time observation immediately when student responds
+    # This ensures the coordinator has accurate time data during its collection window
+    if state.started_at do
+      observation = calculate_observation(state, timestamp)
+      publish_observation(observation, timestamp)
+      Logger.info("[Timekeeper] Student responded - publishing fresh time data: #{observation.remaining_seconds}s remaining, pressure: #{observation.pressure}")
     end
 
     {:noreply, state}
