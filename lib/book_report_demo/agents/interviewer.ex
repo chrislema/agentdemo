@@ -12,10 +12,9 @@ defmodule BookReportDemo.Agents.Interviewer do
   require Logger
 
   alias BookReportDemo.Content.WrinkleInTime
+  alias BookReportDemo.LLMConfig
   alias Jido.AI.Prompt
   alias Jido.AI.Actions.Langchain
-
-  @model_name "claude-3-5-haiku-20241022"
 
   defstruct [
     topics: [],
@@ -154,17 +153,16 @@ defmodule BookReportDemo.Agents.Interviewer do
   end
 
   defp generate_probe_question(topic, history, probe_attempt, depth_feedback) do
-    api_key = System.get_env("ANTHROPIC_API_KEY")
-
-    if is_nil(api_key) or api_key == "" do
+    if not LLMConfig.has_api_key?() do
       # Fallback to a generic probe
       {:ok, "Can you tell me more about that? What specific details from the book support your answer?"}
     else
       topic_info = WrinkleInTime.get_topic(topic)
       prompt = build_probe_prompt(topic_info, history, probe_attempt, depth_feedback)
+      model_spec = LLMConfig.get_model_spec()
 
       case Langchain.run(%{
-        model: {:anthropic, [model: @model_name, api_key: api_key]},
+        model: model_spec,
         prompt: prompt,
         temperature: 0.7,
         max_tokens: 150
@@ -180,18 +178,17 @@ defmodule BookReportDemo.Agents.Interviewer do
   end
 
   defp generate_transition(current_topic, next_topic, history) do
-    api_key = System.get_env("ANTHROPIC_API_KEY")
-
-    if is_nil(api_key) or api_key == "" do
+    if not LLMConfig.has_api_key?() do
       next_info = WrinkleInTime.get_topic(next_topic)
       {:ok, "Great, let's move on. #{next_info.starter}"}
     else
       current_info = WrinkleInTime.get_topic(current_topic)
       next_info = WrinkleInTime.get_topic(next_topic)
       prompt = build_transition_prompt(current_info, next_info, history)
+      model_spec = LLMConfig.get_model_spec()
 
       case Langchain.run(%{
-        model: {:anthropic, [model: @model_name, api_key: api_key]},
+        model: model_spec,
         prompt: prompt,
         temperature: 0.7,
         max_tokens: 150
@@ -237,7 +234,7 @@ defmodule BookReportDemo.Agents.Interviewer do
       _ -> ""
     end
 
-    system_content = """
+    base_system = """
     You are a warm, encouraging interviewer discussing "A Wrinkle in Time" with a student.
     Generate ONE natural follow-up question to probe deeper into their understanding.
     Don't be condescending. Be curious and encouraging.
@@ -250,6 +247,12 @@ defmodule BookReportDemo.Agents.Interviewer do
 
     Respond with ONLY the question, no preamble, no quotes.
     """
+
+    # Inject resource context if available (especially helpful for faster models)
+    system_content = case LLMConfig.get_resource(:interviewer) do
+      nil -> base_system
+      resource -> base_system <> "\n\n" <> resource
+    end
 
     user_content = """
     Conversation so far:
@@ -278,11 +281,17 @@ defmodule BookReportDemo.Agents.Interviewer do
   defp build_transition_prompt(current_info, next_info, history) do
     history_text = format_history(history)
 
-    system_content = """
+    base_system = """
     You are a warm, encouraging interviewer discussing "A Wrinkle in Time" with a student.
     Transition naturally from one topic to another.
     Respond with ONLY the question, no preamble, no quotes.
     """
+
+    # Inject resource context if available (especially helpful for faster models)
+    system_content = case LLMConfig.get_resource(:interviewer) do
+      nil -> base_system
+      resource -> base_system <> "\n\n" <> resource
+    end
 
     user_content = """
     Conversation so far:

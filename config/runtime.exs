@@ -23,6 +23,22 @@ end
 config :book_report_demo, BookReportDemoWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# LLM Provider Configuration
+# Supports: anthropic (default), groq, openai
+#
+# Usage examples:
+#   Claude (quality mode):
+#     export LLM_PROVIDER=anthropic
+#     export ANTHROPIC_API_KEY=sk-ant-...
+#
+#   Llama 4 Scout via Groq (speed mode):
+#     export LLM_PROVIDER=groq
+#     export LLM_MODEL=llama-4-scout-17b-16e-instruct
+#     export GROQ_API_KEY=gsk_...
+config :book_report_demo, :llm,
+  provider: String.to_existing_atom(System.get_env("LLM_PROVIDER", "anthropic")),
+  model: System.get_env("LLM_MODEL", "claude-3-5-haiku-20241022")
+
 if config_env() == :prod do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you

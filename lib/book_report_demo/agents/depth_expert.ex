@@ -12,10 +12,9 @@ defmodule BookReportDemo.Agents.DepthExpert do
   require Logger
 
   alias BookReportDemo.Content.WrinkleInTime
+  alias BookReportDemo.LLMConfig
   alias Jido.AI.Prompt
   alias Jido.AI.Actions.Langchain
-
-  @model_name "claude-3-5-haiku-20241022"
 
   defstruct [
     :current_topic,
@@ -111,16 +110,15 @@ defmodule BookReportDemo.Agents.DepthExpert do
   # Private Functions
 
   defp evaluate_response(topic_info, criteria, response, actual_question) do
-    api_key = System.get_env("ANTHROPIC_API_KEY")
-
-    if is_nil(api_key) or api_key == "" do
-      Logger.error("[DepthExpert] ANTHROPIC_API_KEY not set")
+    if not LLMConfig.has_api_key?() do
+      Logger.error("[DepthExpert] No API key configured for #{LLMConfig.current_provider()}")
       {:error, "API key not configured"}
     else
       prompt = build_prompt(topic_info, criteria, response, actual_question)
+      model_spec = LLMConfig.get_model_spec()
 
       case Langchain.run(%{
-        model: {:anthropic, [model: @model_name, api_key: api_key]},
+        model: model_spec,
         prompt: prompt,
         temperature: 0.3,
         max_tokens: 200
@@ -135,7 +133,7 @@ defmodule BookReportDemo.Agents.DepthExpert do
   end
 
   defp build_prompt(topic_info, criteria, response, actual_question) do
-    system_content = """
+    base_system = """
     You are evaluating a student's understanding of "A Wrinkle in Time" for a book report.
     You must respond with ONLY valid JSON, no other text.
 
@@ -143,6 +141,12 @@ defmodule BookReportDemo.Agents.DepthExpert do
     not some abstract criteria. If the question asked for a specific moment and the student
     gave one, that's a good answer even if it doesn't hit every possible depth criteria.
     """
+
+    # Inject resource context if available (especially helpful for faster models)
+    system_content = case LLMConfig.get_resource(:depth_expert) do
+      nil -> base_system
+      resource -> base_system <> "\n\n## Additional Context\n" <> resource
+    end
 
     user_content = """
     Current topic: #{topic_info.name}

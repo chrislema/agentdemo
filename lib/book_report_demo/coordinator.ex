@@ -19,10 +19,9 @@ defmodule BookReportDemo.Coordinator do
 
   alias BookReportDemo.Content.WrinkleInTime
   alias BookReportDemo.InterviewState
+  alias BookReportDemo.LLMConfig
   alias Jido.AI.Prompt
   alias Jido.AI.Actions.Langchain
-
-  @model_name "claude-3-5-haiku-20241022"
 
   # Time window to collect observations after student response
   @collection_window_ms 800
@@ -168,16 +167,15 @@ defmodule BookReportDemo.Coordinator do
   # Private Functions - LLM-powered decision making
 
   defp decide_with_llm(observations, state) do
-    api_key = System.get_env("ANTHROPIC_API_KEY")
-
-    if is_nil(api_key) or api_key == "" do
-      Logger.warning("[Coordinator] No API key, using fallback logic")
+    if not LLMConfig.has_api_key?() do
+      Logger.warning("[Coordinator] No API key for #{LLMConfig.current_provider()}, using fallback logic")
       decide_fallback(observations, state)
     else
       prompt = build_decision_prompt(observations, state)
+      model_spec = LLMConfig.get_model_spec()
 
       case Langchain.run(%{
-        model: {:anthropic, [model: @model_name, api_key: api_key]},
+        model: model_spec,
         prompt: prompt,
         temperature: 0.3,
         max_tokens: 300
@@ -217,7 +215,7 @@ defmodule BookReportDemo.Coordinator do
     next_topic = WrinkleInTime.next_topic(state.current_topic)
     next_topic_name = if next_topic, do: WrinkleInTime.get_topic(next_topic)[:name] || next_topic, else: "none"
 
-    system_content = """
+    base_system = """
     You are the Coordinator in a multi-agent interview system. Your job is to synthesize
     observations from your fellow agents and decide the best course of action.
 
@@ -231,18 +229,16 @@ defmodule BookReportDemo.Coordinator do
     - TRANSITION: Move to the next topic
     - END: End the interview
 
-    IMPORTANT CONSIDERATIONS:
-    - If we've already probed a topic 2-3+ times with mediocre ratings, continuing to probe
-      is unlikely to yield better results. Consider transitioning to cover more ground.
-    - Time pressure is real: if Timekeeper says we're behind, we need to move faster.
-    - A student who gives consistent 2/3 ratings has demonstrated adequate understanding.
-      Pursuing a 3/3 at the cost of topic coverage is usually not worth it.
-    - Watch for signs of student frustration (short answers, repetition, pushback).
-
     Respond in this exact format:
     DECISION: [PROBE or TRANSITION or END]
     REASONING: [Your collaborative reasoning in 1-2 sentences, referencing what each agent observed]
     """
+
+    # Inject resource context if available (especially helpful for faster models)
+    system_content = case LLMConfig.get_resource(:coordinator) do
+      nil -> base_system
+      resource -> base_system <> "\n\n" <> resource
+    end
 
     # Get probe history context
     probe_history_text = format_probe_history(state.probe_history, state.current_topic)
