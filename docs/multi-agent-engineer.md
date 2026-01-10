@@ -384,7 +384,165 @@ defmodule MyApp.Agents.DepthExpert do
 end
 ```
 
-### Pattern 3: Generator Agent
+### Pattern 3: Cross-Agent Awareness
+
+**Critical Learning:** Agents that only subscribe to their "trigger" events make decisions with incomplete information. Agents need situational awareness—they should hear what's happening around them.
+
+**The Problem:**
+```
+DepthExpert subscribes to: interview:student_response
+Interviewer subscribes to: interview:coordinator_directive
+
+Result: DepthExpert evaluates against the STARTER question, not the
+actual question Interviewer asked after probing. Interviewer has no
+idea this is the 4th probe attempt.
+```
+
+**The Solution:**
+```elixir
+# DepthExpert needs to know what question was actually asked
+def init(_opts) do
+  PubSub.subscribe(@pubsub, "interview:student_response")   # Primary trigger
+  PubSub.subscribe(@pubsub, "interview:question_asked")     # Context awareness
+  {:ok, %{last_question_asked: nil}}
+end
+
+def handle_info({:question_asked, %{question: question}}, state) do
+  # Track the actual question so we evaluate against it
+  {:noreply, %{state | last_question_asked: question}}
+end
+
+def handle_info({:student_response, %{response: response}}, state) do
+  # Now evaluate response against actual_question, not starter
+  actual_question = state.last_question_asked || topic_info.starter
+  evaluate_response(response, actual_question)
+end
+```
+
+```elixir
+# Interviewer needs to hear depth feedback and track probe attempts
+def init(_opts) do
+  PubSub.subscribe(@pubsub, "interview:coordinator_directive")  # Primary trigger
+  PubSub.subscribe(@pubsub, "interview:agent_observation")      # Hear colleagues
+  {:ok, %{probe_count: %{}, last_depth_feedback: nil}}
+end
+
+def handle_info({:agent_observation, %{agent: :depth_expert} = obs}, state) do
+  # Track depth feedback to inform our questions
+  {:noreply, %{state | last_depth_feedback: obs}}
+end
+
+def handle_info({:coordinator_directive, %{directive: :probe, topic: topic}}, state) do
+  # Know this is probe attempt #N, vary approach accordingly
+  probe_attempt = Map.get(state.probe_count, topic, 0) + 1
+  generate_probe_question(topic, probe_attempt, state.last_depth_feedback)
+  {:noreply, put_in(state.probe_count[topic], probe_attempt)}
+end
+```
+
+**Pattern Summary:**
+| Agent Type | Primary Subscription | Should Also Subscribe To |
+|------------|---------------------|--------------------------|
+| Evaluator | `{domain}:user_input` | `{domain}:question_asked` (to know actual context) |
+| Generator | `{domain}:coordinator_directive` | `{domain}:agent_observation` (to hear feedback) |
+| Time-based | `{domain}:tick` | `{domain}:user_input` (to publish fresh data for coordinator) |
+
+**Key Insight:** PubSub isn't just for decoupling—it's for shared situational awareness. Agents aren't just publishing; they need to be listening to build context.
+
+---
+
+### Pattern 4: Event-Triggered Publishing
+
+**The Problem:** Time-based agents that only publish on periodic ticks often miss the Coordinator's collection window.
+
+```
+Timekeeper publishes on tick (every 10 seconds)
+Coordinator collection window is 800ms after student_response
+Result: Coordinator often decides with stale time data
+```
+
+**The Solution:** Publish on relevant events, not just heartbeats:
+
+```elixir
+defmodule MyApp.Agents.Timekeeper do
+  def init(_opts) do
+    PubSub.subscribe(@pubsub, "interview:tick")              # Periodic updates
+    PubSub.subscribe(@pubsub, "interview:student_response")  # Event-triggered
+    {:ok, initial_state()}
+  end
+
+  # Still publish on ticks for UI updates
+  def handle_info({:tick, timestamp}, state) do
+    observation = calculate_observation(state, timestamp)
+    publish_observation(observation)
+    {:noreply, state}
+  end
+
+  # ALSO publish when student responds - this is when Coordinator needs fresh data
+  def handle_info({:student_response, %{timestamp: timestamp}}, state) do
+    observation = calculate_observation(state, timestamp)
+    publish_observation(observation)
+    Logger.debug("Timekeeper: Published fresh time data for Coordinator collection window")
+    {:noreply, state}
+  end
+end
+```
+
+**Key Insight:** Match publication timing to consumption patterns. If the Coordinator opens a collection window on `student_response`, agents that have relevant data should publish on that event.
+
+---
+
+### Pattern 5: Frustration Detection
+
+When evaluating user responses, meta-signals about interaction quality matter as much as content quality.
+
+```elixir
+defmodule MyApp.Agents.DepthExpert do
+  defp build_prompt(topic, question, response) do
+    Prompt.new()
+    |> Prompt.with_system("""
+    Evaluate the student's response.
+
+    Also note if the student seems frustrated:
+    - Short, dismissive answers
+    - "I already said that"
+    - Repeating previous answer verbatim
+    - Visible annoyance markers
+
+    Respond with JSON:
+    {
+      "rating": 1-3,
+      "recommendation": "probe|accept|move_on",
+      "note": "explanation",
+      "frustration_detected": true/false
+    }
+    """)
+  end
+
+  defp parse_result(result) do
+    # If frustration detected, override recommendation to move_on
+    recommendation = if result["frustration_detected"] && result["recommendation"] == "probe" do
+      Logger.info("Frustration detected - recommending move_on instead of probe")
+      :move_on
+    else
+      String.to_atom(result["recommendation"])
+    end
+
+    %{
+      rating: result["rating"],
+      recommendation: recommendation,
+      note: result["note"],
+      frustration_detected: result["frustration_detected"]
+    }
+  end
+end
+```
+
+**Key Insight:** An agent that only evaluates content misses half the picture. The quality of the interaction itself is a signal.
+
+---
+
+### Pattern 6: Generator Agent
 
 LLM agent that generates natural language output.
 
@@ -525,6 +683,83 @@ end
 
 The Coordinator synthesizes observations and issues directives.
 
+### Probe History for Pattern Awareness
+
+**The Problem:** Stateless coordinators make each decision fresh, leading to repetitive behavior:
+
+```
+Student gives 2/3 answer on theme
+Coordinator: PROBE
+Student gives another 2/3 answer
+Coordinator: PROBE (doesn't know we already probed)
+Student gives another 2/3 answer
+Coordinator: PROBE (still doesn't know)
+Result: Stuck in a loop, never covering other topics
+```
+
+**The Solution:** Track interaction history per topic:
+
+```elixir
+defstruct [
+  # ... existing fields
+  # Track probe history per topic so LLM can reason about patterns
+  probe_history: %{}  # %{topic => [%{response_summary: "", rating: 2, decision: :probe}, ...]}
+]
+
+# After making a decision, record it
+defp record_probe_history(state, {decision_type, _topic, _reason}) do
+  topic = state.current_topic
+  depth_obs = Map.get(state.observations, :depth_expert, %{})
+
+  entry = %{
+    response_summary: String.slice(state.pending_response || "", 0, 100),
+    rating: Map.get(depth_obs, :rating, nil),
+    decision: decision_type
+  }
+
+  # Add to history for this topic
+  current_history = Map.get(state.probe_history, topic, [])
+  Map.put(state.probe_history, topic, current_history ++ [entry])
+end
+
+# Include in LLM prompt
+defp format_probe_history(probe_history, topic) do
+  history = Map.get(probe_history, topic, [])
+
+  if Enum.empty?(history) do
+    "This is the first response on this topic."
+  else
+    count = length(history)
+    ratings = history |> Enum.map(& &1.rating) |> Enum.reject(&is_nil/1)
+    avg = if Enum.empty?(ratings), do: "N/A", else: Float.round(Enum.sum(ratings) / length(ratings), 1)
+
+    """
+    We have probed this topic #{count} time(s) already.
+    Average rating so far: #{avg}/3
+    Previous decisions: #{history |> Enum.map(& &1.decision) |> Enum.join(", ")}
+    """
+  end
+end
+```
+
+Then inject this context into the Coordinator's LLM prompt:
+
+```
+PROBE HISTORY FOR THIS TOPIC:
+We have probed this topic 3 time(s) already.
+Average rating so far: 2.0/3
+Previous decisions: probe, probe, probe
+
+Based on this history, continuing to probe is unlikely to yield better results.
+Consider transitioning to cover more ground.
+```
+
+**Key Insight:** Historical context enables better decisions. A stateless coordinator will repeat the same patterns endlessly.
+
+---
+
+### Basic Coordinator Implementation
+
 ```elixir
 defmodule MyApp.Coordinator do
   @moduledoc """
@@ -537,9 +772,9 @@ defmodule MyApp.Coordinator do
   alias Phoenix.PubSub
   alias Jido.AI.Prompt
   alias Jido.AI.Actions.Langchain
+  alias MyApp.LLMConfig
 
   @pubsub MyApp.PubSub
-  @model "claude-3-5-haiku-20241022"
   @collection_window_ms 800
   @max_retries 3
 
@@ -1260,39 +1495,234 @@ end
 
 ---
 
-## Configuration Pattern
+## LLM Configuration Pattern
 
-Environment-based configuration for LLM and services.
+### Centralized Configuration Module
+
+**The Problem:** Each agent having `@model "claude-3-5-haiku-20241022"` hardcoded means:
+- Changing models requires editing multiple files
+- No ability to switch providers (Anthropic vs Groq vs OpenAI)
+- API key management scattered across agents
+
+**The Solution:** Centralized `LLMConfig` module:
 
 ```elixir
-# config/config.exs
-import Config
+defmodule MyApp.LLMConfig do
+  @moduledoc """
+  Centralized LLM configuration. All agents use this to get model specs.
 
-config :my_app,
-  ecto_repos: [MyApp.Repo]
+  Configure via environment:
+    LLM_PROVIDER=groq
+    LLM_MODEL=llama-4-scout-17b-16e-instruct
+    GROQ_API_KEY=gsk_...
 
-config :my_app, MyAppWeb.Endpoint,
-  url: [host: "localhost"],
-  adapter: Bandit.PhoenixAdapter,
-  render_errors: [
-    formats: [html: MyAppWeb.ErrorHTML, json: MyAppWeb.ErrorJSON],
-    layout: false
-  ],
-  pubsub_server: MyApp.PubSub,
-  live_view: [signing_salt: "your_salt_here"]
+  Or use defaults (Anthropic Claude):
+    ANTHROPIC_API_KEY=sk-ant-...
+  """
 
-# Import environment specific config
-import_config "#{config_env()}.exs"
+  require Logger
+
+  @default_provider :anthropic
+  @default_model "claude-3-5-haiku-20241022"
+
+  @api_key_env_vars %{
+    anthropic: "ANTHROPIC_API_KEY",
+    groq: "GROQ_API_KEY",
+    openai: "OPENAI_API_KEY"
+  }
+
+  @endpoints %{
+    groq: "https://api.groq.com/openai/v1/chat/completions"
+  }
+
+  @doc """
+  Get the model specification for LLM calls.
+  Returns tuple suitable for Jido.AI.Actions.Langchain.
+  """
+  def get_model_spec do
+    provider = current_provider()
+    model = current_model()
+    api_key = get_api_key(provider)
+
+    case provider do
+      :groq ->
+        # Groq uses OpenAI-compatible API with custom endpoint
+        {:openai, [model: model, api_key: api_key, endpoint: @endpoints[:groq]]}
+
+      :anthropic ->
+        {:anthropic, [model: model, api_key: api_key]}
+
+      :openai ->
+        {:openai, [model: model, api_key: api_key]}
+    end
+  end
+
+  def current_provider do
+    config = Application.get_env(:my_app, :llm, [])
+    Keyword.get(config, :provider, @default_provider)
+  end
+
+  def current_model do
+    config = Application.get_env(:my_app, :llm, [])
+    Keyword.get(config, :model, @default_model)
+  end
+
+  def has_api_key? do
+    api_key = get_api_key(current_provider())
+    not is_nil(api_key) and api_key != ""
+  end
+
+  defp get_api_key(provider) do
+    env_var = Map.get(@api_key_env_vars, provider, "ANTHROPIC_API_KEY")
+    System.get_env(env_var)
+  end
+end
 ```
+
+**Agent usage:**
+```elixir
+# Instead of hardcoded model
+# @model "claude-3-5-haiku-20241022"
+
+# Use centralized config
+alias MyApp.LLMConfig
+
+defp call_llm(prompt) do
+  if not LLMConfig.has_api_key?() do
+    {:error, "No API key configured for #{LLMConfig.current_provider()}"}
+  else
+    model_spec = LLMConfig.get_model_spec()
+
+    Langchain.run(%{
+      model: model_spec,
+      prompt: prompt,
+      temperature: 0.3,
+      max_tokens: 200
+    })
+  end
+end
+```
+
+---
+
+### Resource Files for Faster LLMs
+
+**Why Resource Files Exist:**
+
+Faster LLMs (like Llama 4 via Groq) offer speed and cost benefits but may have less analytical depth than Claude. Resource files provide additional context that helps these models make better decisions.
+
+**The Philosophy:**
+
+We still use LLMs because we want their **thinking and creativity**. If we just wanted them to do A when we see B, we can code that without agents. Resource files don't replace the LLM's judgment—they enrich its context so it can reason more effectively.
+
+**Resource File Pattern:**
+
+```
+priv/
+└── llm_resources/
+    ├── coordinator.md      # Decision-making context
+    ├── depth_expert.md     # Evaluation rubrics and examples
+    └── interviewer.md      # Conversation style and strategies
+```
+
+**Example Resource File (`priv/llm_resources/coordinator.md`):**
+
+```markdown
+# Coordinator Context
+
+You are the Coordinator in a collaborative multi-agent interview system.
+
+## Your Collaborators
+
+**Timekeeper** tracks pace and signals time pressure. Their job is to inform,
+not dictate. Sometimes depth on fewer topics is more valuable than rushing.
+
+**Depth Expert** evaluates answer quality (1-3 scale). Trust their assessment
+of content, but remember they only see the academic dimension.
+
+**Grader** tracks cumulative performance. They care about coverage, but
+coverage without depth isn't particularly useful.
+
+## The Art of Coordination
+
+**Depth vs Breadth**: A student who deeply understands 3 topics has learned
+more than one who superficially covered 5. Find the sweet spot.
+
+**Persistence vs Respect**: Pushing too hard on a struggling student rarely
+yields better answers. Recognize when to move on gracefully.
+
+## Reading the Room
+
+- Multiple 2/3 ratings with good engagement? Move on.
+- A 1/3 with a specific incorrect detail? Maybe worth one probe.
+- Frustration detected, already probed twice? Time to transition.
+```
+
+**Loading Resources in Agents:**
+
+```elixir
+defmodule MyApp.LLMConfig do
+  @doc """
+  Get agent-specific resource context from priv/llm_resources/.
+  """
+  def get_resource(agent_name) do
+    path = resource_path(agent_name)
+
+    if File.exists?(path) do
+      case File.read(path) do
+        {:ok, content} -> content
+        {:error, _} -> nil
+      end
+    else
+      nil
+    end
+  end
+
+  defp resource_path(agent_name) do
+    priv_dir = :code.priv_dir(:my_app) |> to_string()
+    Path.join([priv_dir, "llm_resources", "#{agent_name}.md"])
+  end
+end
+```
+
+**Using Resources in Prompts:**
+
+```elixir
+defp build_decision_prompt(observations, state) do
+  base_system = """
+  You are the Coordinator. Synthesize observations and decide next action.
+  Options: PROBE, TRANSITION, END
+  """
+
+  # Inject resource context if available (helps faster models)
+  system_content = case LLMConfig.get_resource(:coordinator) do
+    nil -> base_system
+    resource -> base_system <> "\n\n" <> resource
+  end
+
+  Prompt.new()
+  |> Prompt.with_system(system_content)
+  |> Prompt.with_user(format_observations(observations))
+end
+```
+
+**Key Insight:** Resource files compensate for model capability differences while still leveraging the LLM's reasoning. Claude might not need the extra context; Llama benefits significantly from it.
+
+---
+
+## Environment Configuration
 
 ```elixir
 # config/runtime.exs
 import Config
 
-if config_env() == :prod do
-  config :my_app,
-    anthropic_api_key: System.fetch_env!("ANTHROPIC_API_KEY")
+# LLM Provider Configuration
+# Supports: anthropic (default), groq, openai
+config :my_app, :llm,
+  provider: String.to_existing_atom(System.get_env("LLM_PROVIDER", "anthropic")),
+  model: System.get_env("LLM_MODEL", "claude-3-5-haiku-20241022")
 
+if config_env() == :prod do
   config :my_app, MyAppWeb.Endpoint,
     url: [host: System.fetch_env!("PHX_HOST"), port: 443, scheme: "https"],
     http: [
@@ -1301,11 +1731,18 @@ if config_env() == :prod do
     ],
     secret_key_base: System.fetch_env!("SECRET_KEY_BASE")
 end
+```
 
-if config_env() == :dev do
-  config :my_app,
-    anthropic_api_key: System.get_env("ANTHROPIC_API_KEY")
-end
+**Environment Variables:**
+```bash
+# Claude (quality mode - default)
+export LLM_PROVIDER=anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Llama 4 Scout via Groq (speed mode)
+export LLM_PROVIDER=groq
+export LLM_MODEL=llama-4-scout-17b-16e-instruct
+export GROQ_API_KEY=gsk_...
 ```
 
 ---
@@ -1524,6 +1961,12 @@ CMD ["/app/bin/server"]
 - **Collection windows for LLM agents:** Wait for async responses
 - **Fallback logic everywhere:** System works when LLM is down
 - **Debug panel in UI:** See agent observations in real-time
+- **Cross-agent awareness:** Agents subscribe to each other's outputs for context
+- **Event-triggered publishing:** Time-based agents publish on relevant events, not just ticks
+- **Track interaction history:** Coordinators maintain probe history per topic
+- **Detect meta-signals:** Frustration, engagement, and interaction quality matter
+- **Centralize LLM configuration:** One module for model specs, not scattered constants
+- **Use resource files:** Enrich prompts for faster LLMs while preserving their judgment
 
 ### Don't
 
@@ -1532,6 +1975,10 @@ CMD ["/app/bin/server"]
 - **Don't put business logic in LiveView:** LiveView is for UI state
 - **Don't ignore collection window timing:** Tune based on actual latencies
 - **Don't forget to log Coordinator decisions:** Critical for debugging
+- **Don't make stateless coordinators:** They repeat the same patterns endlessly
+- **Don't evaluate against wrong context:** DepthExpert needs actual question, not starter
+- **Don't ignore publication timing:** Match when you publish to when consumers need data
+- **Don't hardcode model names in agents:** Use centralized LLMConfig module
 
 ---
 
@@ -1576,10 +2023,44 @@ end
 ### LLM Call Pattern
 
 ```elixir
+alias MyApp.LLMConfig
+
 Task.start(fn ->
-  case call_llm(prompt) do
-    {:ok, result} -> publish_observation(result)
-    {:error, _} -> publish_fallback_observation()
+  if not LLMConfig.has_api_key?() do
+    publish_fallback_observation()
+  else
+    model_spec = LLMConfig.get_model_spec()
+
+    # Optionally inject resource context for faster models
+    system_with_resource = case LLMConfig.get_resource(:my_agent) do
+      nil -> base_system
+      resource -> base_system <> "\n\n" <> resource
+    end
+
+    case Langchain.run(%{model: model_spec, prompt: prompt}) do
+      {:ok, result} -> publish_observation(result)
+      {:error, _} -> publish_fallback_observation()
+    end
   end
 end)
+```
+
+### Cross-Agent Subscription Pattern
+
+```elixir
+def init(_opts) do
+  PubSub.subscribe(@pubsub, "{domain}:primary_trigger")     # What triggers my action
+  PubSub.subscribe(@pubsub, "{domain}:context_events")      # What gives me context
+  {:ok, %{context_state: nil}}
+end
+
+def handle_info({:context_event, data}, state) do
+  # Store context for when primary trigger fires
+  {:noreply, %{state | context_state: data}}
+end
+
+def handle_info({:primary_trigger, data}, state) do
+  # Use stored context when processing
+  process(data, state.context_state)
+end
 ```

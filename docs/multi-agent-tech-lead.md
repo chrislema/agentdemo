@@ -425,7 +425,76 @@ Simple classifiers: Llama (cost optimization)
 
 ---
 
-## Decision 7: Real-Time UI Integration
+## Decision 7: LLM Configuration Strategy
+
+How do you manage LLM providers, models, and prompts across multiple agents?
+
+### The Problem
+
+Each agent having hardcoded `@model "claude-3-5-haiku-20241022"` creates issues:
+- Changing models requires editing multiple files
+- No ability to switch providers (Claude vs Llama vs GPT)
+- API key management scattered across agents
+- No way to optimize prompts for different model capabilities
+
+### Solution: Centralized Configuration + Resource Files
+
+**Centralized `LLMConfig` Module:**
+- Single source of truth for provider, model, and API keys
+- Environment-based configuration (`LLM_PROVIDER`, `LLM_MODEL`)
+- One function call: `LLMConfig.get_model_spec()`
+
+**Resource Files (`priv/llm_resources/`):**
+- Agent-specific context files (`.md`)
+- Injected into system prompts at runtime
+- Help faster models (Llama) make better decisions
+- Claude might not need them; Llama benefits significantly
+
+### The Philosophy
+
+We use LLMs because we want their **thinking and creativity**. If we just wanted them to do A when we see B, we can code that without agents.
+
+Resource files don't replace the LLM's judgment—they enrich its context so it can reason more effectively. This is different from rule-based systems: the LLM still makes the decision, but with better information.
+
+### When to Use Resource Files
+
+| Model Type | Resource Files Recommended? |
+|------------|---------------------------|
+| Claude Sonnet/Haiku | Optional - usually works well without |
+| Llama 4 Scout (Groq) | Recommended - benefits from explicit context |
+| GPT-4 | Optional - depends on task complexity |
+| Smaller models | Required - need maximum context |
+
+### Implementation Pattern
+
+```elixir
+# LLMConfig provides model spec
+model_spec = LLMConfig.get_model_spec()
+
+# Resource file provides context for this agent
+base_system = "Evaluate the student's answer..."
+system_with_resource = case LLMConfig.get_resource(:depth_expert) do
+  nil -> base_system
+  resource -> base_system <> "\n\n" <> resource
+end
+```
+
+### Configuration Options
+
+| Decision | Options | When to Choose |
+|----------|---------|----------------|
+| Single provider | `LLM_PROVIDER=anthropic` | Consistency, simpler debugging |
+| Per-agent provider | Extend LLMConfig with agent-specific settings | Cost optimization (Llama for simple, Claude for complex) |
+| Resource files | `priv/llm_resources/{agent}.md` | When using faster/smaller models |
+| No resource files | Just use base prompts | When using Claude and prompts are working well |
+
+### Reference Implementation
+
+See `/docs/multi-agent-engineer.md` - "LLM Configuration Pattern" section.
+
+---
+
+## Decision 8: Real-Time UI Integration
 
 How does the UI stay in sync with agent activity?
 
@@ -483,6 +552,8 @@ end
 | Collection window | 800ms for single LLM, longer for multiple | Tune based on observed latencies |
 | State management | Central + local hybrid | Pure local only if agents are truly independent |
 | LLM provider | Claude for all reasoning tasks | Llama for simple/high-volume tasks |
+| LLM configuration | Centralized LLMConfig module | Never hardcode models in agents |
+| Resource files | Use with faster models (Llama/Groq) | Optional for Claude, required for smaller models |
 | UI integration | LiveView + PubSub subscriptions | REST API only if no real-time needed |
 
 ---
@@ -525,6 +596,18 @@ BAD: Coordinator returns :probe with no explanation
 GOOD: Coordinator returns {:probe, "Answer was shallow, time allows follow-up"}
 ```
 
+### 7. Hardcoded Model Names in Agents
+```
+BAD: @model "claude-3-5-haiku-20241022" in each agent file
+GOOD: model_spec = LLMConfig.get_model_spec()
+```
+
+### 8. Stateless Coordinator Decisions
+```
+BAD: Each decision made fresh with no history
+GOOD: Track probe_history per topic, inject into LLM prompt
+```
+
 ---
 
 ## Checklist Before Implementation
@@ -535,7 +618,12 @@ GOOD: Coordinator returns {:probe, "Answer was shallow, time allows follow-up"}
 - [ ] Collection window duration determined
 - [ ] State management strategy (central vs local) for each data type
 - [ ] LLM provider selected for each LLM agent
+- [ ] Centralized LLMConfig module planned
+- [ ] Resource files needed for faster models identified
 - [ ] Fallback logic defined for each LLM agent
+- [ ] Coordinator probe history tracking planned
+- [ ] Cross-agent subscriptions mapped (who listens to whom)
+- [ ] Event-triggered publishing planned (not just periodic)
 - [ ] UI integration pattern chosen
 - [ ] PubSub topic naming convention established
 - [ ] Debug observability planned (agent panel, logging)
